@@ -90,5 +90,6 @@ public:
 	}
 };
 int main() {
+	cout << "test committing";
 	return 0;
 }
