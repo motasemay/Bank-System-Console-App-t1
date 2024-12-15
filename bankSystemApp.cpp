@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <regex>
 using namespace std;
 class Account {
 private:
@@ -12,22 +13,22 @@ private:
 	bool isActive;
 public:
 	Account() {
-		setUserName("");
-		setEmail("");
-		setPassword("");
-		setPhoneNumber("");
-		setAge(0);
-		setBalance(0.00);
-		setIsActive(true);
+		userName = "";
+		email = "";
+		password="";
+		phoneNumber="";
+		age=0;
+		balance = 0.00;
+		isActive = true;
 	}
 	Account(double newBalance) {
-		setUserName("");
-		setEmail("");
-		setPassword("");
-		setPhoneNumber("");
-		setAge(0);
+		userName = "";
+		email = "";
+		password = "";
+		phoneNumber = "";
+		age = 0;
 		setBalance(newBalance);
-		setIsActive(true);
+		isActive = true;
 	}
 	Account(const string& newUserName, const string& newEmail, const string& newPassword, const string& newPhoneNumber, int newAge, double newBalance=0.00) {
 		setUserName(newUserName);
@@ -38,23 +39,56 @@ public:
 		setBalance(newBalance);
 		setIsActive(true);
 	}
+
+	//using setters for input validaiton
+
 	void setUserName(const string& UserName) {
+		if (UserName == "" || UserName == " "||UserName.length()<3 || UserName.length()>50) {
+			cout << "\n Invalid User Name. ";
+			return;
+		}
 		userName = UserName;
 	}
 	void setEmail(const string& Email) {
-		email = Email;
+		const regex emailRegex = regex(R"(^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$)");
+		if (regex_match(Email, emailRegex)) {
+			email = Email;
+		}
+		else {
+			cout << "\n Invalid Email format";
+		}
 	}
 	void setPassword(const string& Password) {
+		if (Password.length() < 8) {
+			cout << "\n Invalid Password.";
+			return;
+		}
 		password = Password;
 	}
 	void setPhoneNumber(const string& PhoneNumber) {
-		phoneNumber = PhoneNumber;
+		const regex phoneNumberRegex = regex("\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})");
+		if (regex_match(PhoneNumber, phoneNumberRegex)) {
+			phoneNumber = PhoneNumber;
+		}
+		cout << "\n INvalid phone number format";	
 	}
 	void setAge(int Age) {
+		if (Age > 0 && Age < 130) {
 		age = Age;
+
+		}
+		else {
+			cout << "\n Invalid age";
+		}
 	}
 	void setBalance(double Balance) {
+		if (Balance >= 0 && Balance < 1000000) {
 		balance = Balance;
+
+		}
+		else {
+			cout << "\n Invlaid balance value";
+		}
 	}
 	void setIsActive(bool IsActive) {
 		isActive = IsActive;
@@ -70,16 +104,17 @@ public:
 
 
 	void DisplayAccountInfo()const { //read account info
-		cout << endl << userName << " Account info: \n"
-			<< "Balance= [ " << balance << " ]\n"
-			<< "Email : " << email << endl
-			<< "Password : " << password << endl
-			<< userName << " age is : " << age << endl
+		cout << endl << getUserName() << " Account info: \n"
+			<< "Balance= [ " << getBalance() << " ]\n"
+			<< "Email : " << getEmail() << endl
+			<< "Password : " << getPassword() << endl
+			<< "PhoneNumber is :" << getPhoneNumber() << endl
+			<< userName << " age is : " << getAge() << endl
 			<< "Status: " << (getIsActive() ? "ACTIVE" : "NOT Active");
 	}
 	//able to withdraw money from the relevant account.
 	void withdraw(double amount) {
-		if (amount > this->balance|| amount<=0) {
+		if (amount > this->getBalance() || amount <= 0) {
 			cout << "\n Withdrawa failed.";
 			return;
 		}
@@ -104,7 +139,7 @@ public:
 			"\nyour balance now: " << getBalance();
 
 	}
-
+	//can update account info (i.e. email, phoneâ¦)
 	void updateAccountInfo() {
 
 		int operationNumber = 0;
@@ -168,17 +203,22 @@ public:
 		case 5: cout << "\n---------"; break;
 
 		default:
-			cout << "\nBad Input, stay with writen range";
+			cout << "\nBad Input, stay with written range";
 			break;
 		}
 		}
 	}
 
+
 };	
+class Customer : public Account{
+
+};
 int main() {
 
 	Account a;
-	a.updateAccountInfo();
+	a.setUserName("mot");
+	a.setEmail("est@e@sxample.com");
 	a.DisplayAccountInfo();
 
 	return 0;
