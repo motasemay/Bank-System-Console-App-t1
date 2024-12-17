@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <regex>
+#include<fstream>
+
 using namespace std;
 class Account {
 private:
@@ -11,6 +13,8 @@ private:
 	int age;
 	double balance;
 	bool isActive;
+	fstream auditFile;
+
 public:
 	Account() {
 		userName = "";
@@ -20,6 +24,12 @@ public:
 		age=0;
 		balance = 0.00;
 		isActive = true;
+
+		auditFile.open("audit.txt", ios::app);
+		if (!auditFile)
+			cout << "\n unable to open audit file";
+		else
+			auditFile << "\n-Auditting " << getUserName() << " Account is statered.";
 	}
 	Account(double newBalance) {
 		userName = "";
@@ -29,6 +39,12 @@ public:
 		age = 0;
 		setBalance(newBalance);
 		isActive = true;
+
+		auditFile.open("audit.txt", ios::app);
+		if (!auditFile)
+			cout << "\n unable to open audit file";
+		else
+			auditFile << "--Auditting " << getUserName() << "'s Account is statered.";
 	}
 	Account(const string& newUserName, const string& newEmail, const string& newPassword, const string& newPhoneNumber, int newAge, double newBalance=0.00) {
 		setUserName(newUserName);
@@ -38,8 +54,22 @@ public:
 		setAge(newAge);
 		setBalance(newBalance);
 		setIsActive(true);
-	}
 
+
+		auditFile.open("audit.txt", ios::app);
+		if (!auditFile)
+			cout << "\n unable to open audit file";
+		else
+			auditFile << "---Auditting " << getUserName() << "'s Account is statered.";
+	}
+	~Account() {
+		
+			DisplayAuditFile();
+		if (auditFile.is_open()) {
+			auditFile << "\n -Audit file is closed for " << getUserName() << " Account.";
+			auditFile.close();
+		}
+	}
 	//using setters for input validaiton
 
 	void setUserName(const string& UserName) {
@@ -102,8 +132,29 @@ public:
 	double getBalance()const {return balance;}
 	bool getIsActive()const {return isActive;}
 
+	void DisplayAuditFile()const {
+		ifstream auditFile("audit.txt");
+		if (auditFile.is_open()) {
+			cout << "\n\n-------------------------------------------------\n the Audit file content: ";
+			string auditLine;
+			while (getline(auditFile, auditLine))
+				cout << "\n" << auditLine;
 
-	void DisplayAccountInfo()const { //read account info
+			cout << "\n--------------------------------------------------";
+			auditFile.close();
+		}
+		else {
+			cout << "\n Cannot open audit file....";
+		}
+	}
+	void DisplayAccountInfo() { //read account info
+		if (auditFile.is_open()) { 
+			auditFile << "\n- Displayed User Information for " << getUserName();
+		}
+		else {
+			cout << "\n Audit file is not available in DisplayAccountInfo function.";
+		}
+		
 		cout << endl << getUserName() << " Account info: \n"
 			<< "Balance= [ " << getBalance() << " ]\n"
 			<< "Email : " << getEmail() << endl
@@ -120,6 +171,12 @@ public:
 		}
 		setBalance(getBalance() - amount);
 
+		if (auditFile.is_open()) {
+			auditFile << "\n- withrawed "<<amount<< " from "<< getUserName();
+		}
+		else {
+			cout << "\n Audit file is not available in withdraw function." << endl;
+		}
 		cout <<endl<<amount<<" is withdrew from your account"
 			"\nyour balance now: " << getBalance();
 	}
@@ -135,6 +192,12 @@ public:
 		}
 
 		setBalance(getBalance() + amount);
+		if (auditFile.is_open()) {
+			auditFile << "\n- deposited " << amount << " to " << getUserName() <<" 's Account.";
+		}
+		else {
+			cout << "\n Audit file is not available in withdraw function." << endl;
+		}
 		cout << endl << amount << " was deposited to your account"
 			"\nyour balance now: " << getBalance();
 
@@ -200,25 +263,42 @@ public:
 			if (newValue != newPhoneNumber) cout << "\nUpdating Phone Number failed";
 			else cout << "\n Phone Number is Updated.";
 		}break;
-		case 5: cout << "\n---------"; break;
+		case 5: {
+			cout << "\n---------";
+			if (auditFile.is_open()) {
+				auditFile << "\n- updatting" << getUserName() << " Informations .";
+			}
+			else {
+				cout << "\n Audit file is not available in updateAccountInfo function." << endl;
+			}
+		}
+			  break;
 
 		default:
 			cout << "\nBad Input, stay with written range";
 			break;
 		}
+
 		}
 	}
 
 
 };	
 class Customer : public Account{
+public:
+	Customer() {
+
+	}
+	
 
 };
 int main() {
 
-	Account a;
-	a.setUserName("mot");
+	Customer a;
+	a.setUserName("motasem");
 	a.setEmail("est@e@sxample.com");
+	a.deposit(233);
+	a.withdraw(21);
 	a.DisplayAccountInfo();
 
 	return 0;
