@@ -2,6 +2,7 @@
 #include <string>
 #include <regex>
 #include<fstream>
+#include<vector>
 
 using namespace std;
 class Account {
@@ -286,8 +287,7 @@ public:
 };	
 class Customer : public Account{
 public:
-	
-	void customerMenu() {
+		void customerMenu() {
 		int choice = 0;
 		while (choice != 6) {
 			cout << "\nCUSTOMER MENU:"
@@ -339,12 +339,277 @@ public:
 			}
 		}
 	}
+};
 
+class Admin:public Customer {
+private:
+	vector<Account> accounts;
+
+public:
+	Admin() {
+
+	}
+	~Admin() {
+
+	}
+
+
+	//The admin will be able to read, create, updateand delete user's accounts.
+
+
+	void createNewAccount() {
+		
+		Account newAccount;
+
+		string newUserName;
+		string newEmail;
+		string newPassword;
+		string ConfirmPassword;
+		string newPhoneNumber;
+		int newAge;
+		double newBalance;
+		cout << "\n Creating new Account: "
+			<< "\n Enter Account's user name: "; 
+		cin.ignore();
+		getline(cin, newUserName);
+		newAccount.setUserName(newUserName);
+
+		cout << "\n Enter Account's Email: ";
+		cin.ignore();
+		getline(cin, newEmail);
+		newAccount.setEmail(newEmail);
+
+
+		while (true)
+		{		
+		cout << "\n Enter Accounts' Password: ";
+		cin.ignore();
+		getline(cin, newPassword);
+		cout << "\n RE-Enter the password: ";
+		cin.ignore();
+		getline(cin, ConfirmPassword);
+		if (newPassword == ConfirmPassword) {
+			newAccount.setPassword(newPassword);
+			break;
+		}
+		else {
+			cout << "\n the passwords you entered isn't match, try again..";
+		}
+		}
+
+		cout << "\n Enter the Accounts Phone Number: ";
+		cin.ignore();
+		getline(cin, newPhoneNumber);
+		newAccount.setPhoneNumber(newPhoneNumber);
+
+		cout << "\n Enter the User's Age: ";
+		cin >> newAge;
+		newAccount.setAge(newAge);
+
+		char test = '0';
+		while (test!='Y'||test!='y') {
+		cout << "\n Enter the Balance you want it to be in the Account's: ";
+		cin >> newBalance;
+		
+		cout << "\nCRITICAL OPERATION: \n	are you sure you want " << getUserName() << " to have " << newBalance << " in his account ? [Y] yes, [N] no, other inputs will considered NO";
+		cin >> test;
+		
+		if (test=='Y'||test=='y') {
+			newAccount.setBalance(newBalance);
+		}
+		}
+
+		newAccount.setIsActive(true);
+
+		accounts.push_back(newAccount);
+		cout << "\n new Account created successfully..";
+
+	}
+
+	void deleteAccount(const string& accountPhoneNumber) {
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getPhoneNumber() == accountPhoneNumber) {
+				accounts.erase(accounts.begin() + i);
+				cout << "\n" << accounts[i].getUserName() << " Account's is deleted X ";
+				return;
+			}
+		}
+		cout << "\n Delete :there is no Account with such a phone number";
+	}
+	void updateAccount(const string& accountPhoneNumber) {
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getPhoneNumber() == accountPhoneNumber) {
+				accounts[i].updateAccountInfo();
+				cout << "\n" << accounts[i].getUserName() << " Account's info is updated";
+				return;
+			}
+		}
+		cout << "\n Update :there is no Account with such a phone number";
+		
+	}
+
+	//The admin will be able to withdraw money from the relevant account.
+
+	void withdrawFromAccount(const string& accountPhoneNumber,double amount) {
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getPhoneNumber() == accountPhoneNumber) {
+				accounts[i].withdraw(amount);
+				cout << "\n" << amount << " is withdrawed from "<<accounts[i].getUserName() << "'s Account";
+				return;
+			}
+		}
+		cout << "\n Withdraw from Account :there is no Account with such a phone number";
+		
+
+	}
+
+	//The admin will be able to deposit money to the relevant account.
+
+	void depositToAccount(const string& accountPhoneNumber,double amount) {
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getPhoneNumber() == accountPhoneNumber) {
+				accounts[i].deposit(amount);
+				cout << "\n" << amount << " is deposited to " << accounts[i].getUserName() << "'s Account";
+				return;
+			}
+		}
+		cout << "\n Deposit to Account :there is no Account with such a phone number";
+		
+	}
+
+	//The admin can view a list of all active accounts.
+
+	void displayActiveAccounts()const {
+		int counter = 1;
+		cout << "\n Active Accounts: [ ";
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getIsActive() == false) continue;
+			cout << endl << counter << "." << accounts[i].getUserName() << "  " << accounts[i].getPhoneNumber();
+			counter++;
+			
+		}
+	}	
+	void displayInactiveAccounts()const {
+		int counter = 1;
+		cout << "\n Inactive Accounts: [ ";
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getIsActive() == true) continue;
+			cout << endl << counter << "." << accounts[i].getUserName() << "  " << accounts[i].getPhoneNumber();
+			counter++;
+			
+		}
+	}
+
+
+
+	//The admin can activate/ deactivate accounts.
+
+	void deactivateAccount(const string& accountPhoneNumber) {
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getPhoneNumber() == accountPhoneNumber) {
+				if (accounts[i].getIsActive() == false) {
+					cout << "\n" << accounts[i].getUserName() << " Account's is already Dactivated...";
+					return;
+				}
+				accounts[i].setIsActive(false);
+				cout << "\n" << accounts[i].getUserName() << " Account's is deactivated ";
+				return;
+			}
+		}
+		cout << "\n Deactivate Account :there is no Account with such a phone number";
+	}
+	void activateAccount(const string& accountPhoneNumber) {
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getPhoneNumber() == accountPhoneNumber) {
+				if (accounts[i].getIsActive() == true) {
+					cout << "\n" << accounts[i].getUserName() << " Account's is already Active..";
+					return;
+				}
+				accounts[i].setIsActive(true);
+				cout << "\n" << accounts[i].getUserName() << " Account's is Aactivated ";
+				return;
+			}
+		}
+		cout << "\n Activate Account :there is no Account with such a phone number";
+	}	
+
+	void adminMenu() {
+		int choise = 0;
+		while (choise != 10) {
+
+			cout << "\n Admin Menu: "
+				<< "\n 1.Create A New Account."
+				<< "\n 2.Delete An Account."
+				<< "\n 3.Update An Account."
+				<< "]n 4.Withdraw from An Account."
+				<< "\n5.Deposit To An Account."
+				<< "\n6.Display Active Accounts."
+				<< "\n7.Display InActive Accounts"
+				<< "\n8.Deactivate An Account."
+				<< "\n9.Activate An Account."
+				<< "\n10. CLOSE This Menu";
+			cin >> choise;
+
+			switch (choise) {
+			case 1: {
+				createNewAccount();
+			}break;
+			case 2: {
+				cout << "\n Enter the phone number for the Account to Delete: ";
+
+				string searchPhoneNumber;
+				cin.ignore();
+				getline(cin, searchPhoneNumber);
+				deleteAccount(searchPhoneNumber);
+
+			}break;
+			case 3: {
+				cout << "\n Enter the phone number for the Account to Update: ";
+				string searchPhoneNumber;
+				cin.ignore();
+				getline(cin, searchPhoneNumber);
+				updateAccount(searchPhoneNumber);
+
+			}break;
+			case 4: {
+				cout << "\n Enter the phone number for the Account to withdraw from: ";
+				string searchPhoneNumber;
+				int amount = 0;
+				cin.ignore();
+				getline(cin, searchPhoneNumber);
+				cout << "\n how much you want to withdraw: ";
+				cin >> amount;
+				withdrawFromAccount(searchPhoneNumber,amount);
+
+			}break;
+			case 5: {
+
+			}break;
+			case 6: {
+
+			}break;
+			case 7: {
+
+			}break;
+			case 8: {
+
+			}break;
+			case 9: {
+
+			case 10: {
+
+			}break;
+			}
+			}
+
+
+		}
+	}
 
 };
 int main() {
 
-	Customer a;
+	Admin a;
 	a.customerMenu();
 	a.setUserName("motasem");
 	a.setEmail("est@e@sxample.com");
