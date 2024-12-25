@@ -5,6 +5,21 @@
 #include<vector>
 
 using namespace std;
+
+/*
+void clearauditfile() {
+	ofstream auditfile("audit.txt", ios::out);
+	if (auditfile.is_open()) {
+		auditfile.close();
+	}
+	else {
+		cout << "\n\n faild to open audit file for clearing it";
+	}
+}*/
+
+	//fstream auditFile;
+
+
 class Account {
 private:
 	string userName;
@@ -14,7 +29,6 @@ private:
 	int age;
 	double balance;
 	bool isActive;
-	fstream auditFile;
 
 public:
 	Account() {
@@ -26,11 +40,11 @@ public:
 		balance = 0.00;
 		isActive = true;
 
-		auditFile.open("audit.txt", ios::app);
-		if (!auditFile)
-			cout << "\n unable to open audit file";
-		else
-			auditFile << "\n-Auditting " << getUserName() << " Account is statered.";
+	//	auditFile.open("audit.txt", ios::app);
+	//	if (!auditFile)
+	//		cout << "\n unable to open audit file";
+	//	else
+	//		auditFile << "\n-Auditting " << getUserName() << " Account is statered.";
 	}
 	Account(double newBalance) {
 		userName = "";
@@ -41,11 +55,12 @@ public:
 		setBalance(newBalance);
 		isActive = true;
 
-		auditFile.open("audit.txt", ios::app);
+		/*auditFile.open("audit.txt", ios::app);
 		if (!auditFile)
 			cout << "\n unable to open audit file";
 		else
 			auditFile << "--Auditting " << getUserName() << "'s Account is statered.";
+			*/
 	}
 	Account(const string& newUserName, const string& newEmail, const string& newPassword, const string& newPhoneNumber, int newAge, double newBalance=0.00) {
 		setUserName(newUserName);
@@ -57,22 +72,40 @@ public:
 		setIsActive(true);
 
 
-		auditFile.open("audit.txt", ios::app);
+	/*	auditFile.open("audit.txt", ios::app);
 		if (!auditFile)
 			cout << "\n unable to open audit file";
 		else
-			auditFile << "---Auditting " << getUserName() << "'s Account is statered.";
+			auditFile << "---Auditting " << getUserName() << "'s Account is statered.";*/
 	}
 	~Account() {
 		
-			DisplayAuditFile();
+	/*		DisplayAuditFile();
 		if (auditFile.is_open()) {
 			auditFile << "\n -Audit file is closed for " << getUserName() << " Account.";
 			auditFile.close();
-		}
+		}*/
+		//clearAuditFile();
 	}
 	//using setters for input validaiton
+	bool passwordValidation(const string&testPassword) {
+		if (testPassword.length() < 8) {
+			cout << "\n Invalid Password.";
+			return 0;
+		}
+		return 1;
+	}
+	bool phoneNumberValidation(const string& testPhoneNumber) {
+		const regex phoneNumberRegex = regex("\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})");
+		if (regex_match(testPhoneNumber, phoneNumberRegex)) {
+			return 1;
+		}
+		else {
+			cout << "\n INvalid phone number format";
+			return 0;
 
+		}
+	}
 	void setUserName(const string& UserName) {
 		if (UserName == "" || UserName == " "||UserName.length()<3 || UserName.length()>50) {
 			cout << "\n Invalid User Name. ";
@@ -90,18 +123,16 @@ public:
 		}
 	}
 	void setPassword(const string& Password) {
-		if (Password.length() < 8) {
-			cout << "\n Invalid Password.";
-			return;
-		}
-		password = Password;
+		if(passwordValidation(Password))
+			password = Password;
 	}
 	void setPhoneNumber(const string& PhoneNumber) {
-		const regex phoneNumberRegex = regex("\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})");
-		if (regex_match(PhoneNumber, phoneNumberRegex)) {
+		if (phoneNumberValidation(PhoneNumber))
+		{
 			phoneNumber = PhoneNumber;
+			cout << "\nsuck secen";
 		}
-		cout << "\n INvalid phone number format";	
+	
 	}
 	void setAge(int Age) {
 		if (Age > 0 && Age < 130) {
@@ -133,7 +164,7 @@ public:
 	double getBalance()const {return balance;}
 	bool getIsActive()const {return isActive;}
 
-	void DisplayAuditFile()const {
+	/*void DisplayAuditFile()const {
 		ifstream auditFile("audit.txt");
 		if (auditFile.is_open()) {
 			cout << "\n\n-------------------------------------------------\n the Audit file content: ";
@@ -147,15 +178,15 @@ public:
 		else {
 			cout << "\n Cannot open audit file....";
 		}
-	}
+	}*/
 	void DisplayAccountInfo() { //read account info
-		if (auditFile.is_open()) { 
+	/*	if (auditFile.is_open()) { 
 			auditFile << "\n- Displayed User Information for " << getUserName();
 		}
 		else {
 			cout << "\n Audit file is not available in DisplayAccountInfo function.";
 		}
-		
+		*/
 		cout << endl << getUserName() << " Account info: \n"
 			<< "Balance= [ " << getBalance() << " ]\n"
 			<< "Email : " << getEmail() << endl
@@ -172,12 +203,12 @@ public:
 		}
 		setBalance(getBalance() - amount);
 
-		if (auditFile.is_open()) {
+	/*	if (auditFile.is_open()) {
 			auditFile << "\n- withrawed "<<amount<< " from "<< getUserName();
 		}
 		else {
 			cout << "\n Audit file is not available in withdraw function." << endl;
-		}
+		}*/
 		cout <<endl<<amount<<" is withdrew from your account"
 			"\nyour balance now: " << getBalance();
 	}
@@ -193,12 +224,12 @@ public:
 		}
 
 		setBalance(getBalance() + amount);
-		if (auditFile.is_open()) {
+	/*	if (auditFile.is_open()) {
 			auditFile << "\n- deposited " << amount << " to " << getUserName() <<" 's Account.";
 		}
 		else {
 			cout << "\n Audit file is not available in withdraw function." << endl;
-		}
+		}*/
 		cout << endl << amount << " was deposited to your account"
 			"\nyour balance now: " << getBalance();
 
@@ -266,12 +297,12 @@ public:
 		}break;
 		case 5: {
 			cout << "\n---------";
-			if (auditFile.is_open()) {
+			/*if (auditFile.is_open()) {
 				auditFile << "\n- updatting" << getUserName() << " Informations .";
 			}
 			else {
 				cout << "\n Audit file is not available in updateAccountInfo function." << endl;
-			}
+			}*/
 		}
 			  break;
 
@@ -284,7 +315,7 @@ public:
 	}
 
 
-};	
+};
 class Customer : public Account{
 public:
 		void customerMenu() {
@@ -325,7 +356,7 @@ public:
 				break;
 			}
 			case 5: {
-				DisplayAuditFile();
+				//DisplayAuditFile();
 				break;
 			}
 			case 6: {
@@ -341,24 +372,22 @@ public:
 	}
 };
 
-class Admin:public Customer {
+
+class Admin :public Customer {
+
 private:
 	vector<Account> accounts;
 
 public:
 	Admin() {
-
-	}
-	~Admin() {
-
+		
 	}
 
 
 	//The admin will be able to read, create, updateand delete user's accounts.
 
-
 	void createNewAccount() {
-		
+
 		Account newAccount;
 
 		string newUserName;
@@ -369,54 +398,64 @@ public:
 		int newAge;
 		double newBalance;
 		cout << "\n Creating new Account: "
-			<< "\n Enter Account's user name: "; 
+			<< "\n Enter Account's user name: ";
 		cin.ignore();
 		getline(cin, newUserName);
 		newAccount.setUserName(newUserName);
 
 		cout << "\n Enter Account's Email: ";
-		cin.ignore();
 		getline(cin, newEmail);
 		newAccount.setEmail(newEmail);
 
 
 		while (true)
-		{		
-		cout << "\n Enter Accounts' Password: ";
-		cin.ignore();
-		getline(cin, newPassword);
-		cout << "\n RE-Enter the password: ";
-		cin.ignore();
-		getline(cin, ConfirmPassword);
-		if (newPassword == ConfirmPassword) {
-			newAccount.setPassword(newPassword);
-			break;
+		{
+			cout << "\n Enter Accounts' Password: ";
+			cin.ignore();
+			getline(cin, newPassword);
+
+			if (!passwordValidation(newPassword))
+				continue;
+
+			cout << "\n RE-Enter the password: ";
+			cin.ignore();
+			getline(cin, ConfirmPassword);
+			if (newPassword == ConfirmPassword) {
+				newAccount.setPassword(newPassword);
+				break;
+			}
+			else {
+				cout << "\n the passwords you entered isn't match, try again..";
+			}
 		}
-		else {
-			cout << "\n the passwords you entered isn't match, try again..";
-		}
-		}
+		while (true)
+		{
 
 		cout << "\n Enter the Accounts Phone Number: ";
 		cin.ignore();
 		getline(cin, newPhoneNumber);
+
+		if (!phoneNumberValidation(newPhoneNumber))
+			continue;
 		newAccount.setPhoneNumber(newPhoneNumber);
+	
+		}
 
 		cout << "\n Enter the User's Age: ";
 		cin >> newAge;
 		newAccount.setAge(newAge);
 
 		char test = '0';
-		while (test!='Y'||test!='y') {
-		cout << "\n Enter the Balance you want it to be in the Account's: ";
-		cin >> newBalance;
-		
-		cout << "\nCRITICAL OPERATION: \n	are you sure you want " << getUserName() << " to have " << newBalance << " in his account ? [Y] yes, [N] no, other inputs will considered NO";
-		cin >> test;
-		
-		if (test=='Y'||test=='y') {
-			newAccount.setBalance(newBalance);
-		}
+		while (test != 'Y' && test != 'y') {
+			cout << "\n Enter the Balance you want it to be in the Account's: ";
+			cin >> newBalance;
+
+			cout << "\nCRITICAL OPERATION: \n	are you sure you want " << getUserName() << " to have " << newBalance << " in his account ? [Y] yes, [N] no, other inputs will considered NO";
+			cin >> test;
+
+			if (test == 'Y' || test == 'y') {
+				newAccount.setBalance(newBalance);
+			}
 		}
 
 		newAccount.setIsActive(true);
@@ -429,8 +468,9 @@ public:
 	void deleteAccount(const string& accountPhoneNumber) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getPhoneNumber() == accountPhoneNumber) {
+				string tempUserName = accounts[i].getUserName();
 				accounts.erase(accounts.begin() + i);
-				cout << "\n" << accounts[i].getUserName() << " Account's is deleted X ";
+				cout << "\n" << tempUserName << " Account's is deleted X ";
 				return;
 			}
 		}
@@ -445,27 +485,27 @@ public:
 			}
 		}
 		cout << "\n Update :there is no Account with such a phone number";
-		
+
 	}
 
 	//The admin will be able to withdraw money from the relevant account.
 
-	void withdrawFromAccount(const string& accountPhoneNumber,double amount) {
+	void withdrawFromAccount(const string& accountPhoneNumber, double amount) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getPhoneNumber() == accountPhoneNumber) {
 				accounts[i].withdraw(amount);
-				cout << "\n" << amount << " is withdrawed from "<<accounts[i].getUserName() << "'s Account";
+				cout << "\n" << amount << " is withdrawed from " << accounts[i].getUserName() << "'s Account";
 				return;
 			}
 		}
 		cout << "\n Withdraw from Account :there is no Account with such a phone number";
-		
+
 
 	}
 
 	//The admin will be able to deposit money to the relevant account.
 
-	void depositToAccount(const string& accountPhoneNumber,double amount) {
+	void depositToAccount(const string& accountPhoneNumber, double amount) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getPhoneNumber() == accountPhoneNumber) {
 				accounts[i].deposit(amount);
@@ -474,7 +514,7 @@ public:
 			}
 		}
 		cout << "\n Deposit to Account :there is no Account with such a phone number";
-		
+
 	}
 
 	//The admin can view a list of all active accounts.
@@ -486,9 +526,9 @@ public:
 			if (accounts[i].getIsActive() == false) continue;
 			cout << endl << counter << "." << accounts[i].getUserName() << "  " << accounts[i].getPhoneNumber();
 			counter++;
-			
+
 		}
-	}	
+	}
 	void displayInactiveAccounts()const {
 		int counter = 1;
 		cout << "\n Inactive Accounts: [ ";
@@ -496,7 +536,7 @@ public:
 			if (accounts[i].getIsActive() == true) continue;
 			cout << endl << counter << "." << accounts[i].getUserName() << "  " << accounts[i].getPhoneNumber();
 			counter++;
-			
+
 		}
 	}
 
@@ -531,7 +571,7 @@ public:
 			}
 		}
 		cout << "\n Activate Account :there is no Account with such a phone number";
-	}	
+	}
 
 	void adminMenu() {
 		int choise = 0;
@@ -547,24 +587,25 @@ public:
 				<< "\n7.Display InActive Accounts"
 				<< "\n8.Deactivate An Account."
 				<< "\n9.Activate An Account."
-				<< "\n10. CLOSE This Menu";
+				<< "\n10. CLOSE This Menu"
+				<<"\n choose the operation: ";
 			cin >> choise;
-
 			switch (choise) {
 			case 1: {
 				createNewAccount();
 			}break;
 			case 2: {
-				cout << "\n Enter the phone number for the Account to Delete: ";
-
+				cout << "\n Enter the phone number for the Account to DELETE: ";
 				string searchPhoneNumber;
+
+
 				cin.ignore();
 				getline(cin, searchPhoneNumber);
 				deleteAccount(searchPhoneNumber);
 
 			}break;
 			case 3: {
-				cout << "\n Enter the phone number for the Account to Update: ";
+				cout << "\n Enter the phone number for the Account to UPDATE: ";
 				string searchPhoneNumber;
 				cin.ignore();
 				getline(cin, searchPhoneNumber);
@@ -572,50 +613,74 @@ public:
 
 			}break;
 			case 4: {
-				cout << "\n Enter the phone number for the Account to withdraw from: ";
+				cout << "\n Enter the phone number for the Account to WITHDRAW from: ";
 				string searchPhoneNumber;
 				int amount = 0;
 				cin.ignore();
 				getline(cin, searchPhoneNumber);
 				cout << "\n how much you want to withdraw: ";
 				cin >> amount;
-				withdrawFromAccount(searchPhoneNumber,amount);
+				withdrawFromAccount(searchPhoneNumber, amount);
 
 			}break;
 			case 5: {
+				cout << "\n Enter the phone number for the Account to DEPOSIT to it: ";
+				string searchPhoneNumber;
+				int amount = 0;
+				cin.ignore();
+				getline(cin, searchPhoneNumber);
+				cout << "\n how much you want to deposit: ";
+				cin >> amount;
+				depositToAccount(searchPhoneNumber, amount);
 
 			}break;
 			case 6: {
-
+				displayActiveAccounts();
 			}break;
 			case 7: {
-
+				displayInactiveAccounts();
 			}break;
 			case 8: {
-
+				cout << "\n Enter the phone number for the Account to DEACTIVATE it: ";
+				string searchPhoneNumber;
+				cin.ignore();
+				getline(cin, searchPhoneNumber);
+				//deactivateAccount(searchPhoneNumber);
 			}break;
 			case 9: {
+				cout << "\n Enter the phone number for the Account to ACTIVATE it: ";
+				string searchPhoneNumber;
+				cin.ignore();
+				getline(cin, searchPhoneNumber);
+				activateAccount(searchPhoneNumber); }break;
 
 			case 10: {
+				cout << "stoped..\n----------------------------------";
 
 			}break;
-			}
+
+
+			default: {
+				cout << "\nInvalid choice, select a valid option: ";
+				break;
 			}
 
 
+
+			}
 		}
-	}
-
-};
+	}};
+	
 int main() {
+	
 
+
+	
 	Admin a;
-	a.customerMenu();
-	a.setUserName("motasem");
-	a.setEmail("est@e@sxample.com");
-	a.deposit(233);
-	a.withdraw(21);
-	a.DisplayAccountInfo();
+	a.setUserName("adminmane");
+	cout << a.getUserName() << endl;
+	a.adminMenu();
+
 
 	return 0;
 }
