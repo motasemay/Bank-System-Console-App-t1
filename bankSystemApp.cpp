@@ -6,10 +6,10 @@
 
 using namespace std;
 
-/*
+/*	if (auditfile.is_open()) {
+
 void clearauditfile() {
 	ofstream auditfile("audit.txt", ios::out);
-	if (auditfile.is_open()) {
 		auditfile.close();
 	}
 	else {
@@ -22,6 +22,9 @@ void clearauditfile() {
 
 class Account {
 private:
+	static int idCounter;
+	int id;
+	string role;
 	string userName;
 	string email;
 	string password;
@@ -32,6 +35,8 @@ private:
 
 public:
 	Account() {
+		id = ++idCounter;
+		role = "customer";
 		userName = "";
 		email = "";
 		password="";
@@ -40,13 +45,20 @@ public:
 		balance = 0.00;
 		isActive = true;
 
+		//saveToDatabase();
 	//	auditFile.open("audit.txt", ios::app);
 	//	if (!auditFile)
 	//		cout << "\n unable to open audit file";
 	//	else
 	//		auditFile << "\n-Auditting " << getUserName() << " Account is statered.";
 	}
+
+
 	Account(double newBalance) {
+		
+		id = ++idCounter;
+		setRole("customer");
+
 		userName = "";
 		email = "";
 		password = "";
@@ -55,6 +67,8 @@ public:
 		setBalance(newBalance);
 		isActive = true;
 
+		//saveToDatabase();
+
 		/*auditFile.open("audit.txt", ios::app);
 		if (!auditFile)
 			cout << "\n unable to open audit file";
@@ -62,15 +76,21 @@ public:
 			auditFile << "--Auditting " << getUserName() << "'s Account is statered.";
 			*/
 	}
-	Account(const string& newUserName, const string& newEmail, const string& newPassword, const string& newPhoneNumber, int newAge, double newBalance=0.00) {
+	Account(const string& newUserName, const string& newEmail, const string& newPassword, const string& newPhoneNumber, int newAge, double newBalance=0.00,const string& newRole="customer") {
+		
+		id = ++idCounter; 
+		setRole("customer");
+
 		setUserName(newUserName);
 		setEmail(newEmail);
 		setPassword(newPassword);
 		setPhoneNumber(newPhoneNumber);
 		setAge(newAge);
 		setBalance(newBalance);
+	
 		setIsActive(true);
 
+	//	saveToDatabase();
 
 	/*	auditFile.open("audit.txt", ios::app);
 		if (!auditFile)
@@ -87,24 +107,45 @@ public:
 		}*/
 		//clearAuditFile();
 	}
+
+	// database for users records to save their data 
+	void saveToDatabase(){
+		ofstream file("usersDatabase.txt", ios::app);
+		if (!file) {
+			cout << "\n ERROR : users database, Cannot open file to save the user's data..";
+			return;
+		}
+		file << id << "," << role << "," << userName << "," << email << "," << password << "," << phoneNumber << "," << age << "," << balance << "," << (isActive ? "Active" : "Inactive") << "\n";
+		file.close();
+		cout << "\n Users Database: Account saved successfully..";
+	}
+
+
 	//using setters for input validaiton
-	bool passwordValidation(const string&testPassword) {
+	bool passwordValidation(const string& testPassword) {
 		if (testPassword.length() < 8) {
-			cout << "\n Invalid Password.";
+			cout << "\n Invalid Password.**";
 			return 0;
 		}
 		return 1;
 	}
-	bool phoneNumberValidation(const string& testPhoneNumber) {
-		const regex phoneNumberRegex = regex("\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})");
-		if (regex_match(testPhoneNumber, phoneNumberRegex)) {
-			return 1;
+	bool phoneNumberValidation(const string& phoneNumber) {
+		if (phoneNumber.length() < 10) {
+			cout << "Invalid phone number: must be exactly 10 digits." << endl;
+			return false;
 		}
-		else {
-			cout << "\n INvalid phone number format";
-			return 0;
 
+		for (int i = 0; i < phoneNumber.length(); i++) {
+			if (!isdigit(phoneNumber[i])) {
+				cout << "Invalid phone number: must contain only digits" << endl;
+				return false;
+			}
 		}
+		return true;
+	}
+
+	void setRole(const string& Role) {
+		role = Role;
 	}
 	void setUserName(const string& UserName) {
 		if (UserName == "" || UserName == " "||UserName.length()<3 || UserName.length()>50) {
@@ -130,7 +171,6 @@ public:
 		if (phoneNumberValidation(PhoneNumber))
 		{
 			phoneNumber = PhoneNumber;
-			cout << "\nsuck secen";
 		}
 	
 	}
@@ -143,19 +183,24 @@ public:
 			cout << "\n Invalid age";
 		}
 	}
-	void setBalance(double Balance) {
-		if (Balance >= 0 && Balance < 1000000) {
+	bool setBalance(double Balance) {
+		if (Balance >= 0 && Balance < 100000) {
 		balance = Balance;
-
+		return true;
 		}
 		else {
 			cout << "\n Invlaid balance value";
+			return false;
 		}
 	}
 	void setIsActive(bool IsActive) {
 		isActive = IsActive;
 	}
 
+
+
+	int getId()const { return id; }
+	string getRole()const { return role; }
 	string getUserName()const {	return userName;}
 	string getEmail()const {return email;}
 	string getPassword()const {return password;}
@@ -163,6 +208,9 @@ public:
 	int getAge()const {return age;}
 	double getBalance()const {return balance;}
 	bool getIsActive()const {return isActive;}
+
+
+
 
 	/*void DisplayAuditFile()const {
 		ifstream auditFile("audit.txt");
@@ -316,6 +364,10 @@ public:
 
 
 };
+
+int Account::idCounter = 0;  // start counting id 's
+
+
 class Customer : public Account{
 public:
 		void customerMenu() {
@@ -389,7 +441,7 @@ public:
 	void createNewAccount() {
 
 		Account newAccount;
-
+		string newRole;
 		string newUserName;
 		string newEmail;
 		string newPassword;
@@ -397,31 +449,40 @@ public:
 		string newPhoneNumber;
 		int newAge;
 		double newBalance;
-		cout << "\n Creating new Account: "
-			<< "\n Enter Account's user name: ";
+		cout << "\n Creating new Account: ";
+		
+		
+		
+		cout	<< "\n Enter Account's user name: ";
 		cin.ignore();
 		getline(cin, newUserName);
 		newAccount.setUserName(newUserName);
+		cout << "\n new Account's User Name: " << newAccount.getUserName();
 
 		cout << "\n Enter Account's Email: ";
 		getline(cin, newEmail);
 		newAccount.setEmail(newEmail);
+		cout << "\n new Account's Email: " << newAccount.getEmail();
 
+		cout << "\n Enter Account's Role (customer, admin) : ";
+		cin >> newRole;
+		newAccount.setRole(newRole);
 
+		cin.ignore();
 		while (true)
 		{
 			cout << "\n Enter Accounts' Password: ";
-			cin.ignore();
 			getline(cin, newPassword);
 
 			if (!passwordValidation(newPassword))
 				continue;
 
 			cout << "\n RE-Enter the password: ";
-			cin.ignore();
 			getline(cin, ConfirmPassword);
 			if (newPassword == ConfirmPassword) {
 				newAccount.setPassword(newPassword);
+				cout << "\n new Account's Password: " << newAccount.getPassword();
+
 				break;
 			}
 			else {
@@ -430,37 +491,52 @@ public:
 		}
 		while (true)
 		{
-
 		cout << "\n Enter the Accounts Phone Number: ";
-		cin.ignore();
+		
 		getline(cin, newPhoneNumber);
-
 		if (!phoneNumberValidation(newPhoneNumber))
 			continue;
-		newAccount.setPhoneNumber(newPhoneNumber);
+		else
+		{
+			newAccount.setPhoneNumber(newPhoneNumber);
+			cout << "\n new Account's Phone Number: " << newAccount.getPhoneNumber();
+			break;
+
+		}
 	
 		}
 
 		cout << "\n Enter the User's Age: ";
 		cin >> newAge;
 		newAccount.setAge(newAge);
+		cout << "\n new Account's age: " << newAccount.getAge();
 
 		char test = '0';
 		while (test != 'Y' && test != 'y') {
 			cout << "\n Enter the Balance you want it to be in the Account's: ";
 			cin >> newBalance;
 
-			cout << "\nCRITICAL OPERATION: \n	are you sure you want " << getUserName() << " to have " << newBalance << " in his account ? [Y] yes, [N] no, other inputs will considered NO";
+			cout << "\nCRITICAL OPERATION: \n	are you sure you want " << newAccount.getUserName() << " to have " << newBalance << " in his account ? [Y] yes, [N] no, (other inputs will considered no) : ";
 			cin >> test;
 
 			if (test == 'Y' || test == 'y') {
 				newAccount.setBalance(newBalance);
+				cout << "\n new Account's BALANCE: " << newAccount.getBalance();
+
+				if (!newAccount.setBalance(newBalance)) {
+
+					cout << "\n\nerror in setting the new balance.......";
+					return;
+				}
 			}
 		}
 
 		newAccount.setIsActive(true);
 
 		accounts.push_back(newAccount);
+
+		newAccount.saveToDatabase();
+
 		cout << "\n new Account created successfully..";
 
 	}
@@ -578,10 +654,10 @@ public:
 		while (choise != 10) {
 
 			cout << "\n Admin Menu: "
-				<< "\n 1.Create A New Account."
-				<< "\n 2.Delete An Account."
-				<< "\n 3.Update An Account."
-				<< "]n 4.Withdraw from An Account."
+				<< "\n1.Create A New Account."
+				<< "\n2.Delete An Account."
+				<< "\n3.Update An Account."
+				<< "\n4.Withdraw from An Account."
 				<< "\n5.Deposit To An Account."
 				<< "\n6.Display Active Accounts."
 				<< "\n7.Display InActive Accounts"
@@ -672,12 +748,10 @@ public:
 	}};
 	
 int main() {
-	
 
 
-	
 	Admin a;
-	a.setUserName("adminmane");
+	a.setUserName("motasmayamdj");
 	cout << a.getUserName() << endl;
 	a.adminMenu();
 
