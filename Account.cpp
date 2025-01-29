@@ -7,7 +7,6 @@
 #include<vector>
 using namespace std;
 
-int Account::idCounter = 0;  //need to be rechecked start counting id 's
 
 Account::Account() {
 	id = idGenerator();
@@ -124,7 +123,7 @@ void Account:: loadFromDatabase(int accountId) {
 			getline(recordLine, column, ',');
 			setBalance(Balance);
 			getline(recordLine, column, ',');
-			IsActive = (column == "Active"); // t or f
+			IsActive = (column == "Active"); 
 			setIsActive(IsActive);
 			file.close();
 			return;
@@ -212,13 +211,14 @@ void Account:: updateThisInDatabase() const {
 		int currentId;
 		getline(currentLine, column, ',');
 		currentId = stoi(column);
-		cout << "currentI" << currentId;
+		//cout << "currentI" << currentId;
 		if (currentId == this->id) {
 			databaseLines[i] = to_string(this->id) + "," + this->role + "," + this->userName + "," + getEmail() + "," + getPassword() + "," + getPhoneNumber() + "," + getAge() + "," + getBalance() + "," + (getIsActive() ? "Active" : "Inactive");
 			isFound = true;
 			break;
 		}
 	}
+	// TODO motdfajkd
 	if (!isFound) {
 		cerr << "\nAccount not found in the database for update" << endl;
 		return;
@@ -242,11 +242,11 @@ bool Account::doesAccountExist(const string& checkName)const {
 	ifstream file("usersDatabase.txt");
 	if (!file.is_open()) {
 		cout << "\n Users Database: Error: cannot open file to check if the user Exists";
-		return false;   // doubleCheck HERE
+		return false;   
 	}
 	string line;
 	while (getline(file, line)) {
-		stringstream currentLine(line); //new librarie
+		stringstream currentLine(line);
 		//this is the record structure: 
 		// id,role,name,email,password,phoneNumber,age,balance,isActive
 		//8,admin,motasem,motasem@gmail.com,motasem11,0569676250,26,5152,Active
@@ -262,11 +262,57 @@ bool Account::doesAccountExist(const string& checkName)const {
 //END OF functions for the database
 
 //validation
+
+//double Account::validateDoubleValue(const string& text) {
+//	while (true) {
+//
+//	double value;
+//	cout << text;
+//	cin >> value;
+//	if (cin.fail()) {
+//		cout << "\nInvalid input. Please enter a valid number."<<endl<<endl;
+//		cin.clear(); 
+//		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+//	}
+//	else {
+//		return value;
+//	}
+//	
+//	}
+//}
+template <typename T>
+T Account::getValidInput(const string& text) {
+	while (true) {
+		cout << text;
+
+		string inputLine;
+		getline(cin, inputLine); 
+
+		stringstream ss(inputLine);
+		T typeValue;
+		char extraChar;
+
+
+		if (ss >> typeValue && !(ss >> extraChar)) { 
+			return typeValue;
+		}
+		else {
+			cout << "\nInvalid input, Please enter a valid value:";
+		}
+	}
+}
+template int Account::getValidInput<int>(const string& text);
+template double Account::getValidInput<double>(const string& text); // fixing a LINKER error, sometimes need to explictly instantionate the datatype will used with template
+
 bool Account:: userNameValidation(const string& UserName) {
 	/*	if (UserName == "" || UserName == " " || UserName.length() < 3 || UserName.length() > 50) {
 			cout << "\n Invalid User Name. ";
 			return false;
 		}*/
+	if (UserName.length() == 0) {
+		cout << "\n Invaild User Name, Cannot be EMPTY!";
+		return false;
+	}
 	regex userNameRegex("^[a-zA-Z_-]{3,50}$");
 	if (!regex_match(UserName, userNameRegex)) {
 		cout << "\n Regex:  Invalid User Name. ";
@@ -280,17 +326,25 @@ bool Account:: userNameValidation(const string& UserName) {
 }
 
 bool Account::emailValidation(const string& Email) {
+	if (Email.length() == 0) {
+		cout << "\n Invalid Email, cannot be EMPTY!";
+		return false;
+	}
 	const regex emailRegex = regex(R"(^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$)");
 	if (regex_match(Email, emailRegex)) {
 		return true;
 	}
-	cout << "\n Invalid Email value";
+	cout << "\n Invalid Email format, must be in this format(e.g., john.doe@example.com)";
 	return false;
 }
 
 bool Account::passwordValidation(const string& testPassword) {
+	if (testPassword.length() == 0) {
+		cout << "\n Invalid Password, cannot be EMPTY!";
+		return false;
+	}
 	if (testPassword.length() < 8) {
-		cout << "\n Invalid Password.";
+		cout << "\n Invalid Password, cannot be Less than 8 digits";
 		return 0;
 	}
 	return 1;
@@ -302,6 +356,10 @@ bool Account:: phoneNumberValidation(const string& phoneNumber) {
 			cout << "\nInvalid phone number: must contain only digits";
 			return false;
 		}
+	}
+	if (phoneNumber.length() == 0) {
+		cout << "\nInvalid phone number: cannot be empty";
+		return false;
 	}
 	if (phoneNumber.length() != 10) {
 		cout << "\nInvalid phone number: must be exactly 10 digits";
@@ -316,6 +374,10 @@ bool Account:: phoneNumberValidation(const string& phoneNumber) {
 }
 
 bool Account::ageValidation(const string& Age) {
+	if (Age.length() == 0) {
+		cout << "\n Invalid Age, cannot be EMPTY!";
+		return false;
+	}
 	regex numericRegex("^[0-9]+$");
 	if (!regex_match(Age, numericRegex)) {
 		cout << "\nInvalid age, age must be a numeric value.";
@@ -330,19 +392,49 @@ bool Account::ageValidation(const string& Age) {
 }
 
 bool Account::balanceValidation(const string& Balance) {
-	double doubleBalance = stod(Balance);
-	if (!(doubleBalance >= 0 && doubleBalance < 100000)) {
-		cout << "\n Invalid Balance, balance must not exceed 100,000 and must not be negative value";
+	if (Balance.length() == 0) {
+		cout << "\n Invalid Balance Value, Cannot be EMPTY!";
 		return false;
 	}
-	else {
-		return true;
+	for (int i = 0; i < Balance.length(); i++) {
+		if (!isdigit(Balance[i])) {
+			cout << "\nInvalid Balance: must contain only digits";
+			return false;
+		}
 	}
+	double doubleBalance = stod(Balance);
+	
+	if (!( doubleBalance <= 100000)) {
+		cout << "\n Invalid Balance, balance must not exceed 100,000";
+		return false;
+	}
+	if (!( doubleBalance >= 0)) {
+		cout << "\n Invalid Balance, balance must not be negative value";
+		return false;
+	}
+		return true;
+
+}
+
+bool Account::roleValidation(const string& Role) {
+	if (Role.length() == 0) {
+		cout << "\nInvalid Role, Cannot Be EMPTY!";
+		return false;
+	}
+	if (!(Role == "admin" || Role == "customer"))
+	{
+		cout << "\n invalue Role value it must be (customer) or (admin) ";
+		return false;
+	}
+	return true;
 }
 
 //SETTRS
 void Account::setRole(const string& Role) {
-	role = Role;
+	if (roleValidation(Role))
+		role = Role;
+	else
+		cout << "\n Invalid Role Format";
 }
 
 void Account::setUserName(const string& UserName) {
@@ -368,6 +460,8 @@ void Account::setEmail(const string& Email) {
 void Account::setPassword(const string& Password) {
 	if (passwordValidation(Password))
 		password = Password;
+	else
+		cout << "\n Invalid Password format";
 }
 
 void Account::setPhoneNumber(const string& PhoneNumber) {
@@ -375,6 +469,8 @@ void Account::setPhoneNumber(const string& PhoneNumber) {
 	{
 		phoneNumber = PhoneNumber;
 	}
+	else
+		cout << "\n Invalid Phone Number format";
 }
 
 void Account::setAge(const string& Age) {
@@ -412,7 +508,8 @@ string Account::getAge()const { return age; }
 string Account::getBalance()const { return balance; }
 bool Account::getIsActive()const { return isActive; }
 
-/*void DisplayAuditFile()const {
+/*
+void DisplayAuditFile()const {
 		ifstream auditFile("audit.txt");
 		if (auditFile.is_open()) {
 			cout << "\n\n-------------------------------------------------\n the Audit file content: ";
@@ -426,16 +523,18 @@ bool Account::getIsActive()const { return isActive; }
 		else {
 			cout << "\n Cannot open audit file....";
 		}
-	}*/
-void Account::DisplayAccountInfo() { //read account info
-/*	if (auditFile.is_open()) {
+	}
+	*/
+void Account::displayAccountInfo() { 
+/*	
+if (auditFile.is_open()) {
 		auditFile << "\n- Displayed User Information for " << getUserName();
 	}
 	else {
 		cout << "\n Audit file is not available in DisplayAccountInfo function.";
 	}
 	*/
-	cout << endl<<endl << getUserName() << " Account info: \n"
+	cout <<endl << getUserName() << " Account info: \n"
 		<<"ID: #"<<getId()<<" \n"
 		<< "Balance= [ " << getBalance() << " ]\n"
 		<< "Email : " << getEmail() << endl
@@ -446,16 +545,16 @@ void Account::DisplayAccountInfo() { //read account info
 		<<"\n----------------\n";
 }
 
-//able to withdraw money from the relevant account.
 void Account::withdraw(double amount) {
 	double doubleBalance = stod(this->getBalance());
+	while (true) {
+
 	if (amount > doubleBalance || amount <= 0) {
 		cout << "\n Withdrawa failed.";
 		return;
 	}
 	setBalance(to_string(doubleBalance - amount));
 	updateThisInDatabase();
-
 	/*	if (auditFile.is_open()) {
 			auditFile << "\n- withrawed "<<amount<< " from "<< getUserName();
 		}
@@ -464,9 +563,10 @@ void Account::withdraw(double amount) {
 		}*/
 	cout << endl << amount << " is withdrew from your account"
 		"\nyour balance now: " << getBalance();
+	break;
+	}
 }
 
-//to deposit money to the relevant account.
 void Account::deposit(double amount) {
 	if (amount <= 0) {
 		cout << "\n deposit failed.";
@@ -490,11 +590,10 @@ void Account::deposit(double amount) {
 
 }
 
-//can update account info (i.e. email, phoneâ¦)
 void Account::updateAccountInfo() {
 	int operationNumber = 0;
 	while (operationNumber != 5) {
-		DisplayAccountInfo();
+		displayAccountInfo();
 		cout << " UPDATE ACCOUNT'S INFO PANEL: "
 			<< "\n please choose what operation you want to apply by number: "
 			<< "\n1. Update User Name."

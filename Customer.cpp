@@ -6,50 +6,56 @@ using namespace std;
 
 void Customer :: customerMenu() {
 	int choice = 0;
-	while (choice != 6) {
-		DisplayAccountInfo();
-		cout << "\nCUSTOMER MENU:"
-			<< "\n1. Display Account's Info"
-			<< "\n2. Deposit money"
-			<< "\n3. Withdraw money"
-			<< "\n4. Update Accounts' info"
-			<< "\n5. View audit file"
-			<< "\n6. stop"
-			<< "\nChoose an option: ";
-		cin >> choice;
+	while (choice != 5) {
+		displayAccountInfo();
+		cout << "CUSTOMER MENU:"
+			<< "\n1. Deposit money"
+			<< "\n2. Withdraw money"
+			<< "\n3. Update Accounts' info"
+			<< "\n4. View audit file"
+			<< "\n5. stop";
+		//cin >> stringChoice;
+		//try {
+		//	choice = stoi(stringChoice);
+		//}
+		//catch (const invalid_argument& error) {
+		//	cout << "\n invalid input, Please enter a number.";
+		//	continue;
+		//}
+		//catch (const out_of_range& error) { 
+		//	cout << "\nInput out of range. Please enter a valid number." ;
+		//	continue;
+		//}
+		choice = getValidInput<int>("\n choose operation number: ");
 		switch (choice) {
 		case 1: {
-			DisplayAccountInfo();
-			break;
-		}
-		case 2: {
 			double depositAmount;
-			cout << "\nEnter amount to deposit: ";
-			cin >> depositAmount;
+			depositAmount = getValidInput<double>("\nEnter amount to deposit: ");
 			deposit(depositAmount);
 			break;
 		}
-		case 3: {
+		case 2: {
 			double withdrawAmount;
-			cout << "\nEnter amount to withdraw: ";
-			cin >> withdrawAmount;
+			while (true) {
+			withdrawAmount = getValidInput<double>("\nEnter amount to withdraw: ");
 			withdraw(withdrawAmount);
 			break;
+			}
 		}
-		case 4: {
+		case 3: {
 			updateAccountInfo();
 			break;
 		}
-		case 5: {
+		case 4: {
 			//DisplayAuditFile();
 			break;
 		}
-		case 6: {
+		case 5: {
 			cout << "\nExiting customer menu.\n";
 			break;
 		}
 		default: {
-			cout << "\nInvalid choice, select a valid option: ";
+			cout << "\nInvalid choice number, Please select from the menu ";
 			break;
 		}
 		}

@@ -11,7 +11,7 @@ private:
 public:
 	Admin();
 	void createNewAccount();
-	void DisplayInfoForAccount(const string& accountPhoneNumber);
+	void displayInfoForAccount(const string& accountPhoneNumber);
 	void deleteAccount(const string& accountPhoneNumber);
 	void updateAccount(const string& accountPhoneNumber);
 	void withdrawFromAccount(const string& accountPhoneNumber, double amount);

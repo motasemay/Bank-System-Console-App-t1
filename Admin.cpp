@@ -15,7 +15,7 @@
 		string ConfirmPassword;
 		string newPhoneNumber;
 		string newAge;
-		string newBalance; ///age and balance converted to string to a bettter control the user input.
+		string newBalance; 
 		cout << "\n Creating new Account: \n";
 		cin.ignore();
 		while (true) {
@@ -45,10 +45,9 @@
 
 		while (true) {
 			cout << "\n Enter Account's Role (customer, admin) : ";
-			cin >> newRole;
-			if (!(newRole == "admin" || newRole == "customer"))
-			{
-				cout << "\n invalue Role value it must be (customer) or (admin), try again..";
+			getline(cin, newRole);
+			if (!roleValidation(newRole)) {
+				cout << ", Try Again:";
 				continue;
 			}
 			newAccount.setRole(newRole);
@@ -56,7 +55,6 @@
 		}
 		cout << "\n new Account's Role: " << newAccount.getRole() << endl;
 
-		cin.ignore();
 		while (true)
 		{
 			cout << "\n Enter Accounts' Password: ";
@@ -75,7 +73,7 @@
 			}
 		}
 
-		cin.ignore();
+		
 		while (true)
 		{
 			cout << "\n Enter the Accounts Phone Number: ";
@@ -94,7 +92,7 @@
 
 		while (true) {
 			cout << "\n Enter the User's Age: ";
-			cin >> newAge;
+			getline(cin, newAge);
 			if (!ageValidation(newAge)) {
 				cout << ", Try Again: ";
 				continue;
@@ -112,9 +110,9 @@
 				cout << ", Try Again:";
 				continue;
 			}
-			cout << "\nCRITICAL OPERATION: \n	are you sure you want " << newAccount.getUserName() << " to have " << newBalance << " in his account ? [Y] yes, [N] no, (other inputs will considered no) : ";
+			cout << "\nCRITICAL OPERATION: \n	are you sure you want " << newAccount.getUserName() << " to have " << newBalance << " in his account? [Y] yes,(other inputs will considered no) : ";
 			cin.ignore();
-			cin >> test;
+			getline(cin, test);
 			if (test == "Y" || test == "y") {
 				newAccount.setBalance(newBalance);
 			}
@@ -122,15 +120,16 @@
 		cout << "\n new Account's BALANCE: " << newAccount.getBalance();
 
 		newAccount.setIsActive(true);
+
 		accounts.push_back(newAccount);
 		newAccount.saveToDatabase();
-		cout << "\n new Account created successfully..";
+		cout << "\n new Account created successfully..\n\n";
 	}
 
-	void Admin::DisplayInfoForAccount(const string& accountEmail) {
+	void Admin::displayInfoForAccount(const string& accountEmail) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
-				accounts[i].DisplayAccountInfo();
+				accounts[i].displayAccountInfo();
 				return;
 			}
 		}
@@ -160,7 +159,6 @@
 		cout << "\n Update :there is no Account with such an Email";
 	}
 
-	//The admin will be able to withdraw money from the relevant account.
 	void Admin::withdrawFromAccount(const string& accountEmail, double amount) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
@@ -172,7 +170,6 @@
 		cout << "\n Withdraw from Account :there is no Account with such an Email\n";
 	}
 
-	//The admin will be able to deposit money to the relevant account.
 	void Admin::depositToAccount(const string& accountEmail, double amount) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
@@ -184,7 +181,6 @@
 		cout << "\n Deposit to Account :there is no Account with such an Email\n";
 	}
 
-	//The admin can view a list of all active accounts.
 	void Admin::displayActiveAccounts()const {
 		int counter = 1;
 		cout << "\n Active Accounts: {\n ";
@@ -213,7 +209,6 @@
 		cout << " }\n";
 	}
 
-	//The admin can activate/ deactivate accounts.
 	void Admin::deactivateAccount(const string& accountEmail) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
@@ -272,7 +267,7 @@
 				string searchEmail;
 				cin.ignore();
 				getline(cin, searchEmail);
-				DisplayInfoForAccount(searchEmail);
+				displayInfoForAccount(searchEmail);
 			}break;
 			case 3: {
 				cout << "\n Enter the Email for the Account to DELETE: ";
@@ -294,8 +289,7 @@
 				int amount = 0;
 				cin.ignore();
 				getline(cin, searchEmail);
-				cout << "\n how much you want to withdraw: ";
-				cin >> amount;
+				amount = getValidInput<int>("\n how much you want to withdraw:");
 				withdrawFromAccount(searchEmail, amount);
 			}break;
 			case 6: {
@@ -304,8 +298,7 @@
 				int amount = 0;
 				cin.ignore();
 				getline(cin, searchEmail);
-				cout << "\n how much you want to deposit: ";
-				cin >> amount;
+				amount = getValidInput<int>("\n how much you want to deposit: ");
 				depositToAccount(searchEmail, amount);
 			}break;
 			case 7: {
@@ -319,7 +312,7 @@
 				string searchEmail;
 				cin.ignore();
 				getline(cin, searchEmail);
-				//deactivateAccount(searchEmail);
+				deactivateAccount(searchEmail);
 			}break;
 			case 10: {
 				cout << "\n Enter the Email for the Account to ACTIVATE it: ";
