@@ -35,14 +35,12 @@ public:
 	//validation
 	template<typename T>
 	T getValidInput(const string& text);
-	double validateDoubleValue(const string& text);
 	bool userNameValidation(const string& UserName);
 	bool emailValidation(const string& Email);
 	bool passwordValidation(const string& testPassword);
 	bool phoneNumberValidation(const string& phoneNumber);
 	bool ageValidation(const string& Age);
 	bool balanceValidation(const string& Balance);
-
 	bool roleValidation(const string& Role);
 	
 	//SETTERS

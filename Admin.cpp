@@ -12,12 +12,11 @@
 		string newUserName;
 		string newEmail;
 		string newPassword;
-		string ConfirmPassword;
+		string confirmPassword;
 		string newPhoneNumber;
 		string newAge;
 		string newBalance; 
 		cout << "\n Creating new Account: \n";
-		cin.ignore();
 		while (true) {
 			cout << "\n Enter Account's user name: ";
 			getline(cin, newUserName);
@@ -42,7 +41,7 @@
 			break;
 		}
 		cout << "\n new Account's Email: " << newAccount.getEmail() << endl;
-
+		
 		while (true) {
 			cout << "\n Enter Account's Role (customer, admin) : ";
 			getline(cin, newRole);
@@ -59,17 +58,20 @@
 		{
 			cout << "\n Enter Accounts' Password: ";
 			getline(cin, newPassword);
-			if (!passwordValidation(newPassword))
-				continue;
-			cout << "\n RE-Enter the password: ";
-			getline(cin, ConfirmPassword);
-			if (newPassword == ConfirmPassword) {
+			if (!passwordValidation(newPassword)) {
+				cout << ", Try Again: ";
+				 continue;
+			}
+			cout << " RE-Enter the password: ";
+			getline(cin, confirmPassword);
+			if (newPassword == confirmPassword) {
 				newAccount.setPassword(newPassword);
-				cout << "\n new Account's Password is: " << newAccount.getPassword() << endl;
+				cout << "\n new Account's Password is: " << newAccount.getPassword()<<endl;
 				break;
 			}
 			else {
 				cout << "\n the passwords you entered isn't match, try again..";
+				continue;
 			}
 		}
 
@@ -118,7 +120,6 @@
 			}
 		}
 		cout << "\n new Account's BALANCE: " << newAccount.getBalance();
-
 		newAccount.setIsActive(true);
 
 		accounts.push_back(newAccount);
@@ -126,66 +127,76 @@
 		cout << "\n new Account created successfully..\n\n";
 	}
 
-	void Admin::displayInfoForAccount(const string& accountEmail) {
+	bool Admin::displayInfoForAccount(const string& accountEmail) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				accounts[i].displayAccountInfo();
-				return;
+				return true;
 			}
 		}
-		cout << "\n Display Account's Info :there is no Account with such an Email\n";
+		cout << "\n Display Account's Info :there is no Account with such an Email";
+		return false;
 	}
 
-	void Admin:: deleteAccount(const string& accountEmail) {
+	bool Admin:: deleteAccount(const string& accountEmail) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				string tempUserName = accounts[i].getUserName();
 				accounts.erase(accounts.begin() + i);
 				cout << "\n" << tempUserName << " Account's is deleted X \n";
-				return;
+				return true;
 			}
 		}
-		cout << "\n Delete :there is no Account with such an Email\n";
+		cout << "\n Delete :there is no Account with such an Email";
+		return false;
 	}
 
-	void Admin::updateAccount(const string& accountEmail) {
+	bool Admin::updateAccount(const string& accountEmail) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				accounts[i].updateAccountInfo();
 				cout << "\n" << accounts[i].getUserName() << " Account's info is updated";
-				return;
+				return true;
 			}
 		}
 		cout << "\n Update :there is no Account with such an Email";
+		return false;
 	}
 
-	void Admin::withdrawFromAccount(const string& accountEmail, double amount) {
+	bool Admin::withdrawFromAccount(const string& accountEmail) {
+		double amount; 
+
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
+				amount=getValidInput<int>("\n how much you want to withdraw:");
 				accounts[i].withdraw(amount);
-				cout << "\n" << amount << " is withdrawed from " << accounts[i].getUserName() << "'s Account\n";
-				return;
+				//FIXTHIS: cout << "\n" << amount << " is withdrawed from " << accounts[i].getUserName() << "'s Account";
+				return true;
 			}
 		}
-		cout << "\n Withdraw from Account :there is no Account with such an Email\n";
+		cout << "\n Withdraw from Account :there is no Account with such an Email";
+		return false;
 	}
 
-	void Admin::depositToAccount(const string& accountEmail, double amount) {
+	bool Admin::depositToAccount(const string& accountEmail) {
+		double amount; 
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
+				amount=getValidInput<int>("\n how much you want to deposit: ");
 				accounts[i].deposit(amount);
-				cout << "\n" << amount << " is deposited to " << accounts[i].getUserName() << "'s Account\n";
-				return;
+				//FIXTHIS: cout << "\n" << amount << " is deposited to " << accounts[i].getUserName() << "'s Account";
+				return true;
 			}
 		}
-		cout << "\n Deposit to Account :there is no Account with such an Email\n";
+		cout << "\n Deposit to Account :there is no Account with such an Email";
+		return false;
 	}
 
 	void Admin::displayActiveAccounts()const {
 		int counter = 1;
 		cout << "\n Active Accounts: {\n ";
 		if (accounts.size() != 0) {
-			cout << "  " << " NAME " << "|" << "   ID   " << "|" << "   EMAIL    " << "|" << "  BALANCE  " << "|" << "   ROLE    " << "|" << "      PHONE NUMBER      " << "|" << "   AGE   " << "|" << "  STATUS   ";
+			cout << "  " << " NAME ," <<" ID ," << "   EMAIL ,  " << "   BALANCE ,  " << " ROLE , " << "  PHONE NUMBER , " << "  AGE , " << " STATUS  ";
 		}
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getIsActive() == false) continue;
@@ -199,7 +210,7 @@
 		int counter = 1;
 		cout << "\n Inactive Accounts: {\n ";
 		if (accounts.size() != 0) {
-			cout << "  " << " NAME " << "|" << "   ID   " << "|" << "   EMAIL    " << "|" << "  BALANCE  " << "|" << "   ROLE    " << "|" << "      PHONE NUMBER      " << "|" << "   AGE   " << "|" << "  STATUS   ";
+			cout << "  " << " NAME ," << " ID ," << "   EMAIL ,  " << "   BALANCE ,  " << " ROLE , " << "  PHONE NUMBER , " << "  AGE , " << " STATUS  ";
 		}
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getIsActive() == true) continue;
@@ -209,39 +220,43 @@
 		cout << " }\n";
 	}
 
-	void Admin::deactivateAccount(const string& accountEmail) {
+	bool Admin::deactivateAccount(const string& accountEmail) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				if (accounts[i].getIsActive() == false) {
-					cout << "\n" << accounts[i].getUserName() << " Account's is already Dactivated...\n";
-					return;
+					cout << "\n" << accounts[i].getUserName() << " Account's is already Dactivated...";
+					return true;
 				}
 				accounts[i].setIsActive(false);
-				cout << "\n" << accounts[i].getUserName() << " Account's is deactivated \n";
-				return;
+				cout << "\n" << accounts[i].getUserName() << " Account's is deactivated ";
+				return true;
 			}
 		}
-		cout << "\n Deactivate Account :there is no Account with such an Email\n";
+		cout << "\n Deactivate Account :there is no Account with such an Email";
+		return false;
 	}
 
-	void Admin::activateAccount(const string& accountEmail) {
+	bool Admin::activateAccount(const string& accountEmail) {
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				if (accounts[i].getIsActive() == true) {
-					cout << "\n" << accounts[i].getUserName() << " Account's is already Active..\n";
-					return;
+					cout << "\n" << accounts[i].getUserName() << " Account's is already Active..";
+					return true;
 				}
 				accounts[i].setIsActive(true);
-				cout << "\n" << accounts[i].getUserName() << " Account's is Aactivated \n";
-				return;
+				cout << "\n" << accounts[i].getUserName() << " Account's is Aactivated ";
+				return true;
 			}
 		}
-		cout << "\n Activate Account :there is no Account with such an Email\n";
+		cout << "\n Activate Account :there is no Account with such an Email";
+		return false;
 	}
 
 	void Admin::adminMenu() {
 		int choise = 0;
-		while (choise != 10) {
+		while (choise != 11) {
+			cout << "\n---------";
+
 			displayActiveAccounts();
 			displayInactiveAccounts();
 			cout << "\n Admin Menu: "
@@ -255,51 +270,77 @@
 				<< "\n8.Display InActive Accounts"
 				<< "\n9.Deactivate An Account."
 				<< "\n10.Activate An Account."
-				<< "\n11. CLOSE This Menu"
-				<< "\n choose the operation: ";
-			cin >> choise;
+				<< "\n11. CLOSE This Menu";
+			choise = getValidInput<int>("\n choose the operation: ");
 			switch (choise) {
 			case 1: {
 				createNewAccount();
 			}break;
 			case 2:{
-				cout << "\n Enter the Email for the Account to DISPLAY its Info: ";
 				string searchEmail;
-				cin.ignore();
-				getline(cin, searchEmail);
-				displayInfoForAccount(searchEmail);
+				while (true) {
+					cout << "\n Enter the Email for the Account to DISPLAY its Info: ";
+					getline(cin, searchEmail);
+					if (searchEmail == "stop")break;
+					if (!displayInfoForAccount(searchEmail)) {
+						cout << ", Try again, or write \"stop\": ";
+						continue;
+					}
+					break;
+				}
+				
 			}break;
 			case 3: {
-				cout << "\n Enter the Email for the Account to DELETE: ";
 				string searchEmail;
-				cin.ignore();
-				getline(cin, searchEmail);
-				deleteAccount(searchEmail);
+				while (true) {
+					cout << "\n Enter the Email for the Account to DELETE: ";
+					getline(cin, searchEmail);
+					if (searchEmail == "stop")break;
+					if (!deleteAccount(searchEmail)) {
+						cout << ", Try Again, or write \"stop\" : ";
+						continue;
+					}
+					break;
+				}
 			}break;
 			case 4: {
-				cout << "\n Enter the Email for the Account to UPDATE: ";
 				string searchEmail;
-				cin.ignore();
-				getline(cin, searchEmail);
-				updateAccount(searchEmail);
+				while (true) {
+					cout << "\n Enter the Email for the Account to UPDATE: ";
+					getline(cin, searchEmail);
+					if (searchEmail == "stop")break;
+					if (!updateAccount(searchEmail)) {
+						cout << ", Try Again, or write \"stop\" : ";
+						continue;
+					}
+					break;
+				}
 			}break;
 			case 5: {
-				cout << "\n Enter the Email for the Account to WITHDRAW from: ";
 				string searchEmail;
-				int amount = 0;
-				cin.ignore();
-				getline(cin, searchEmail);
-				amount = getValidInput<int>("\n how much you want to withdraw:");
-				withdrawFromAccount(searchEmail, amount);
+				while (true) {
+					cout << "\n Enter the Email for the Account to WITHDRAW from: ";
+					getline(cin, searchEmail);
+					if (searchEmail == "stop")break;
+					if (!withdrawFromAccount(searchEmail)) {
+						cout << ", Try Again, or write \"stop\" : ";
+						continue;
+					}
+					break;
+				}
 			}break;
 			case 6: {
-				cout << "\n Enter the Email for the Account to DEPOSIT to it: ";
 				string searchEmail;
-				int amount = 0;
-				cin.ignore();
-				getline(cin, searchEmail);
-				amount = getValidInput<int>("\n how much you want to deposit: ");
-				depositToAccount(searchEmail, amount);
+				while (true) {
+					cout << "\n Enter the Email for the Account to DEPOSIT to it: ";
+					getline(cin, searchEmail);
+					if (searchEmail == "stop")break;
+					if (!depositToAccount(searchEmail)) {
+						cout << ", Try Again, or write \"stop\" : ";
+						continue;
+					}
+					break;
+				}
 			}break;
 			case 7: {
 				displayActiveAccounts();
@@ -308,26 +349,38 @@
 				displayInactiveAccounts();
 			}break;
 			case 9: {
-				cout << "\n Enter the Email for the Account to DEACTIVATE it: ";
 				string searchEmail;
-				cin.ignore();
-				getline(cin, searchEmail);
-				deactivateAccount(searchEmail);
+				while (true) {
+					cout << "\n Enter the Email for the Account to DEACTIVATE it: ";
+					getline(cin, searchEmail);
+					if (searchEmail == "stop")break;
+					if (!deactivateAccount(searchEmail)) {
+						cout << ", Try again or write \"stop\": ";
+						continue;
+					}
+					break;
+				}
 			}break;
 			case 10: {
-				cout << "\n Enter the Email for the Account to ACTIVATE it: ";
 				string searchEmail;
-				cin.ignore();
-				getline(cin, searchEmail);
-				activateAccount(searchEmail); }break;
-
+				while (true) {
+					cout << "\n Enter the Email for the Account to ACTIVATE it: ";
+					getline(cin, searchEmail);
+					if (searchEmail == "stop")break;
+					if (!activateAccount(searchEmail)) {
+						cout << ", Try again or write \"stop\": ";
+						continue;
+					}
+					break;
+				}  
+			}break;
 			case 11: {
 				cout << "stoped..\n----------------------------------";
+				cout << "\033[2J\033[1;1H";
 			}break;
 			default: {
 				cout << "\nInvalid choice, select a valid option: ";
-				break;
-			}
+			}break;
 			}
 		}
 	}

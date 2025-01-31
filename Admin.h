@@ -11,15 +11,15 @@ private:
 public:
 	Admin();
 	void createNewAccount();
-	void displayInfoForAccount(const string& accountPhoneNumber);
-	void deleteAccount(const string& accountPhoneNumber);
-	void updateAccount(const string& accountPhoneNumber);
-	void withdrawFromAccount(const string& accountPhoneNumber, double amount);
-	void depositToAccount(const string& accountPhoneNumber, double amount);
+	bool displayInfoForAccount(const string& accountPhoneNumber);
+	bool deleteAccount(const string& accountPhoneNumber);
+	bool updateAccount(const string& accountPhoneNumber);
+	bool withdrawFromAccount(const string& accountPhoneNumber);
+	bool depositToAccount(const string& accountPhoneNumber);
 	void displayActiveAccounts()const;
 	void displayInactiveAccounts()const;
-	void deactivateAccount(const string& accountPhoneNumber);
-	void activateAccount(const string& accountPhoneNumber);
+	bool deactivateAccount(const string& accountPhoneNumber);
+	bool activateAccount(const string& accountPhoneNumber);
 	void adminMenu();
 };
 

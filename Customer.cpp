@@ -1,5 +1,6 @@
 #include "Customer.h"
 #include <iostream>
+#include <cstdlib>
 
 
 using namespace std;
@@ -36,11 +37,10 @@ void Customer :: customerMenu() {
 		}
 		case 2: {
 			double withdrawAmount;
-			while (true) {
 			withdrawAmount = getValidInput<double>("\nEnter amount to withdraw: ");
 			withdraw(withdrawAmount);
 			break;
-			}
+			
 		}
 		case 3: {
 			updateAccountInfo();
@@ -52,6 +52,8 @@ void Customer :: customerMenu() {
 		}
 		case 5: {
 			cout << "\nExiting customer menu.\n";
+			//system("CLS");// ASK: isn't recommanded for security perposes	 
+			cout << "\033[2J\033[1;1H";
 			break;
 		}
 		default: {

@@ -238,7 +238,7 @@ void Account:: updateThisInDatabase() const {
 	}
 }
 
-bool Account::doesAccountExist(const string& checkName)const {
+bool Account::doesAccountExist(const string& checkEmail)const {
 	ifstream file("usersDatabase.txt");
 	if (!file.is_open()) {
 		cout << "\n Users Database: Error: cannot open file to check if the user Exists";
@@ -253,14 +253,15 @@ bool Account::doesAccountExist(const string& checkName)const {
 		string columnn;
 		getline(currentLine, columnn, ','); //skip id
 		getline(currentLine, columnn, ',');  //skip role
-		getline(currentLine, columnn, ','); //reach the userName
-		if (checkName == columnn)
+		getline(currentLine, columnn, ','); //skip userName
+		getline(currentLine, columnn, ','); //reach the email
+		if (checkEmail == columnn)
 			return true;
 	}
 	return false;  //finsh without find
 }
 //END OF functions for the database
-
+	
 //validation
 
 //double Account::validateDoubleValue(const string& text) {
@@ -318,10 +319,6 @@ bool Account:: userNameValidation(const string& UserName) {
 		cout << "\n Regex:  Invalid User Name. ";
 		return false;
 	}
-	if (doesAccountExist(UserName)) {
-		cout << "\n this userName already exists";
-		return false;
-	}
 	return true;
 }
 
@@ -331,11 +328,15 @@ bool Account::emailValidation(const string& Email) {
 		return false;
 	}
 	const regex emailRegex = regex(R"(^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$)");
-	if (regex_match(Email, emailRegex)) {
-		return true;
+	if (!regex_match(Email, emailRegex)) {
+		cout << "\n Invalid Email format, must be in this format(e.g., john.doe@example.com)";
+		return false;
 	}
-	cout << "\n Invalid Email format, must be in this format(e.g., john.doe@example.com)";
-	return false;
+	if (doesAccountExist(Email)) {
+		cout << "\n this Email already exists";
+		return false;
+	}
+	return true;
 }
 
 bool Account::passwordValidation(const string& testPassword) {
@@ -396,23 +397,20 @@ bool Account::balanceValidation(const string& Balance) {
 		cout << "\n Invalid Balance Value, Cannot be EMPTY!";
 		return false;
 	}
+
 	for (int i = 0; i < Balance.length(); i++) {
-		if (!isdigit(Balance[i])) {
+		if (!(isdigit(Balance[i])||Balance[i] == '.')) {
 			cout << "\nInvalid Balance: must contain only digits";
 			return false;
 		}
 	}
 	double doubleBalance = stod(Balance);
 	
-	if (!( doubleBalance <= 100000)) {
-		cout << "\n Invalid Balance, balance must not exceed 100,000";
-		return false;
-	}
 	if (!( doubleBalance >= 0)) {
 		cout << "\n Invalid Balance, balance must not be negative value";
 		return false;
 	}
-		return true;
+	return true;
 
 }
 
@@ -485,11 +483,11 @@ void Account::setAge(const string& Age) {
 }
 
 void Account::setBalance(const string& Balance) {
-	if (balanceValidation(Balance))
+	if (balanceValidation(Balance)) {
 		balance = Balance;
+	}
 	else {
-		cout << "\n Balance Setter : ERror during setting the new balance";
-		return;
+		cout << "\n Balance Setter : Error during setting the new balance";
 	}
 }
 
@@ -534,7 +532,7 @@ if (auditFile.is_open()) {
 		cout << "\n Audit file is not available in DisplayAccountInfo function.";
 	}
 	*/
-	cout <<endl << getUserName() << " Account info: \n"
+	cout <<endl<<endl << getUserName() << " Account info: \n"
 		<<"ID: #"<<getId()<<" \n"
 		<< "Balance= [ " << getBalance() << " ]\n"
 		<< "Email : " << getEmail() << endl
@@ -548,21 +546,20 @@ if (auditFile.is_open()) {
 void Account::withdraw(double amount) {
 	double doubleBalance = stod(this->getBalance());
 	while (true) {
-
 	if (amount > doubleBalance || amount <= 0) {
 		cout << "\n Withdrawa failed.";
 		return;
 	}
 	setBalance(to_string(doubleBalance - amount));
-	updateThisInDatabase();
+	//updateThisInDatabase(); //FIXTHIS: abort() is called 
 	/*	if (auditFile.is_open()) {
 			auditFile << "\n- withrawed "<<amount<< " from "<< getUserName();
 		}
 		else {
 			cout << "\n Audit file is not available in withdraw function." << endl;
 		}*/
-	cout << endl << amount << " is withdrew from your account"
-		"\nyour balance now: " << getBalance();
+	cout << endl << amount << " is withdrew from account"
+		"\nAccount balance now: " << getBalance();
 	break;
 	}
 }
@@ -572,21 +569,22 @@ void Account::deposit(double amount) {
 		cout << "\n deposit failed.";
 		return;
 	}
-	else if (amount > 50000) {
-		cout << "\n deposit failed, you have to visit the bank do deposit that much of money.";
+	else if (amount > 100000) {
+		cout << "\n deposit failed, you have to visit the bank to deposit 100,00 or more.";
 		return;
 	}
-	setBalance(to_string(stod(getBalance()) + amount));
-	updateThisInDatabase();
-
+	double oldBalance = stod(getBalance());
+	double newBalance = oldBalance + amount;
+	setBalance(to_string(newBalance));
+	//updateThisInDatabase();
 	/*	if (auditFile.is_open()) {
 			auditFile << "\n- deposited " << amount << " to " << getUserName() <<" 's Account.";
 		}
 		else {
 			cout << "\n Audit file is not available in withdraw function." << endl;
 		}*/
-	cout << endl << amount << " was deposited to your account"
-		"\nyour balance now: " << getBalance();
+	cout << endl << amount << " was deposited to the account"
+		"\nAccount balance now: " << getBalance();
 
 }
 
@@ -602,61 +600,89 @@ void Account::updateAccountInfo() {
 			<< "\n4. Update Phone Number."
 			<< "\n5. Close this Panel. "
 			;
-		cout << "\n operation: ";
-		cin >> operationNumber;
+		operationNumber = getValidInput<int>("\nupdate operation: ");
 		switch (operationNumber)
 		{
 		case 1: {
 			string newUserName = "";
+			while (true) {
 			cout << "\n please enter the new user name : ";
-			cin.ignore();
 			getline(cin, newUserName);
-			setUserName(newUserName);
-			updateThisInDatabase();
+			if (!userNameValidation(newUserName)){
+				cout << ", Try Again:";
+				continue;
+			}
+			this->setUserName(newUserName);
+			//updateThisInDatabase();
 			string newValue = getUserName();
 			if (newValue != newUserName) cout << "\nUpdating User Name failed";
 			else cout << "\n User Name is Updated.";
-		}
-			  break;
+			break;
+			}
+		}break;
 		case 2: {
 			string newEmail = "";
-			cout << "\n please enter the new email: ";
-			cin.ignore();
-			getline(cin, newEmail);
-			setEmail(newEmail);
-			updateThisInDatabase();
-			string newValue = getEmail();
-			if (newValue != newEmail) cout << "\nUpdating Email failed";
-			else cout << "\n Email is Updated";
-		}
-			  break;
+			while (true) {
+				cout << "\n please enter the new email: ";
+				getline(cin, newEmail);
+				if (!emailValidation(newEmail)) {
+					cout << ", Try Again";
+					continue;
+				}
+				this->setEmail(newEmail);
+				//updateThisInDatabase();
+				string newValue = getEmail();
+				if (newValue != newEmail) cout << "\nUpdating Email failed";
+				else cout << "\n Email is Updated";
+				break;
+			}
+		}break;
 		case 3: {
 			string newPassword = "";
-			cout << "\n please enter the new passwrod : ";
-			cin.ignore();
-			getline(cin, newPassword);
-			setPassword(newPassword);
-			updateThisInDatabase();
-			string newValue = getPassword();
-			if (newValue != newPassword) cout << "\nUpdating Password failed";
-			else
-				cout << "\n Password is Updated.";
-		}
-			  break;
+			string confirmPassword;
+			while (true) {
+
+				cout << "\n please enter the new passwrod : ";
+				getline(cin, newPassword);
+				if (!passwordValidation(newPassword)) {
+					cout << ", Try Again:";
+					continue;
+				}
+				cout << " Re Enter the password: ";
+				getline(cin, confirmPassword);
+				if (newPassword == confirmPassword) {
+					this->setPassword(newPassword);
+					cout << "\n new Account's Password is: " << this->getPassword();
+					break;
+				}
+				else {
+					cout << "\n the passwords you entered isn't match, try again..";
+					continue;
+				}
+				//updateThisInDatabase();
+			} 
+		}break;
 		case 4: {
 			string newPhoneNumber = "";
-			cout << "\n please enter the new phone number : ";
-			cin.ignore();
-			getline(cin, newPhoneNumber);
-			setPhoneNumber(newPhoneNumber);
-			updateThisInDatabase();
-			string newValue = getPhoneNumber();
-			if (newValue != newPhoneNumber) cout << "\nUpdating Phone Number failed";
-			else cout << "\n Phone Number is Updated.";
-		}
-			  break;
+			while (true) {
+				cout << "\n please enter the new phone number : ";
+				getline(cin, newPhoneNumber);
+				if (!phoneNumberValidation(newPhoneNumber)) {
+					cout << ", Try Again:";
+					continue;
+				}
+				this->setPhoneNumber(newPhoneNumber);
+				//updateThisInDatabase();
+				string newValue = getPhoneNumber();
+				if (newValue != newPhoneNumber) cout << "\nUpdating Phone Number failed";
+				else cout << "\n Phone Number is Updated.";
+				break;
+			}
+		}break;
 		case 5: {
+			cout << "\033[2J\033[1;1H";
 			cout << "\n---------";
+
 			/*if (auditFile.is_open()) {
 				auditFile << "\n- updatting" << getUserName() << " Informations .";
 			}
