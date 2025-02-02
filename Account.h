@@ -27,7 +27,7 @@ public:
 	~Account();
 
 	void saveToDatabase()const;
-	void loadFromDatabase(int accountId);
+	void loadFromDatabase(const string& accountId);
 	int idGenerator();
 	void updateThisInDatabase() const;
 	bool doesAccountExist(const string& checkName)const;

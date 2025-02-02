@@ -89,7 +89,7 @@ void Account:: saveToDatabase()const {
 }
 
 //load the user data depend on the id in the userDatabase ( clone it to the current account's data members )
-void Account:: loadFromDatabase(int accountId) {
+void Account:: loadFromDatabase(const string& accountId) {
 	ifstream file("usersDatabase.txt");
 	if (!file) {
 		cout << "\n ERROR : users database, Cannot open file to load the user data..";
@@ -99,9 +99,9 @@ void Account:: loadFromDatabase(int accountId) {
 	while (getline(file, line)) {
 		stringstream recordLine(line);
 		string column;
-		int currentId;
+		string currentId;
 		getline(recordLine, column, ',');
-		currentId = stoi(column);
+		currentId = column;
 		string Role, UserName, Email, Password, PhoneNumber;
 		string Age;
 		bool IsActive;

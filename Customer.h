@@ -10,7 +10,9 @@
 #include "Account.h"
 
 class Customer : public Account {
+	vector<Account> customerAccounts;
 public:
+	void addRelatedAccount();
 	void customerMenu();
 };
 

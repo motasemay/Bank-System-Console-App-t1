@@ -5,6 +5,11 @@
 
 using namespace std;
 
+void Customer::addRelatedAccount()
+{
+
+}
+
 void Customer :: customerMenu() {
 	int choice = 0;
 	while (choice != 5) {

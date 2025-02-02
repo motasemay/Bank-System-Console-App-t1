@@ -150,13 +150,70 @@ void deleteFromDatabase() const {
 
 
 */
+class Bank {
+public:
+	bool authenticateUser() {
+		cout<<"\n------ LOG IN------\n";
+		string Email, Password;
+		cout << "\n Enter your Email: ";
+		getline(cin, Email);
+		cout << "\n Enter your Passrwod:";
+		getline(cin, Password);
 
+		ifstream file("usersDatabase.txt");
+		if (!file) {
+			cout << "\n Error: usersDatabase, cannot find the file for authentication.";
+			return false;
+		}
+		string Role = "none";
+		string line;
+		string storedId, storedRole, storedUserName, storedEmail, storedPassword, storedPhoneNumber, storedAge, storedBalance, storedIsActive;
+		while (getline(file, line)) {
+			stringstream recordLine(line);
+
+			getline(recordLine, storedId, ',');
+			getline(recordLine, storedRole, ',');
+			getline(recordLine, storedUserName, ',');
+			getline(recordLine, storedEmail, ',');
+			getline(recordLine, storedPassword, ',');
+			getline(recordLine, storedPhoneNumber, ',');
+			getline(recordLine, storedAge, ','); 
+			getline(recordLine, storedBalance, ',');
+			getline(recordLine, storedIsActive, ',');
+
+			if (Email == storedEmail&&Password==storedPassword) {
+				Role = storedRole;
+				file.close();
+				break;
+			}
+		}
+		if (Role == "none") {
+			cout << "\n Invalid Email or Password.";
+			file.close();
+			return false;
+		}
+
+		if (Role == "customer"||Role=="Customer") {
+			Customer loginCustomer;
+			loginCustomer.loadFromDatabase(storedId);
+			loginCustomer.customerMenu();
+			return true;
+		}
+		else if (Role == "admin" || Role == "Admin") {
+			Admin loginAdmin;
+			loginAdmin.loadFromDatabase(storedId);
+			loginAdmin.adminMenu();
+			return true;
+		}
+		else {
+			cout << "\n Invalid Authentication Token, you are not allowed to Enter The Bank System.";
+			return false;
+		}
+	}
+};
 int main() {
-	Customer c1;
-	c1.setBalance("1500000d0000");
-	cout << "\n c1 balance : " << c1.getBalance();
-	c1.customerMenu();
-	Admin m;
-	m.adminMenu();
+	Bank B1;
+	B1.authenticateUser();
+
 	return 0;
 }
