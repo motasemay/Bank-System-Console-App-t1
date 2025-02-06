@@ -3,6 +3,7 @@
 #include "Account.h"
 #include "Customer.h"
 #include "Admin.h"
+#include "Bank.h"
 using namespace std;
 /*	if (auditfile.is_open()) {
 
@@ -15,47 +16,6 @@ void clearauditfile() {
 	}
 }*/
 //fstream auditFile;
-/*
-
-void deleteFromDatabase() const {
-	// Similar to updateDatabase, but remove the line instead of modifying it
-	vector<string> databaseLines;
-	ifstream inFile("usersDatabase.txt");
-
-	if (inFile) {
-		string line;
-		while (getline(inFile, line)) {
-			databaseLines.push_back(line);
-		}
-		inFile.close();
-	}
-
-	// Remove the line corresponding to the account ID
-	databaseLines.erase(std::remove_if(databaseLines.begin(), databaseLines.end(),
-		[&](const string& line) {
-			stringstream ss(line);
-			string idStr;
-			getline(ss, idStr, ',');
-
-				return stoi(idStr) == this->id;
-			
-
-
-		}), databaseLines.end());
-
-	ofstream outFile("usersDatabase.txt", ios::out | ios::trunc);
-	if (outFile) {
-		for (const string& line : databaseLines) {
-			outFile << line << endl;
-		}
-		outFile.close();
-		cout << "\n Users Database: Account deleted successfully..";
-	}
-	else {
-		cout << "\n ERROR : users database, Cannot open file to delete account..";
-	}
-}*/
-
 /*
 	void deleteAccount(const string& accountPhoneNumber) {
 		// Find account by phone number and delete from the database
@@ -150,68 +110,8 @@ void deleteFromDatabase() const {
 
 
 */
-class Bank {
-public:
-	bool authenticateUser() {
-		cout<<"\n------ LOG IN------\n";
-		string Email, Password;
-		cout << "\n Enter your Email: ";
-		getline(cin, Email);
-		cout << "\n Enter your Passrwod:";
-		getline(cin, Password);
-
-		ifstream file("usersDatabase.txt");
-		if (!file) {
-			cout << "\n Error: usersDatabase, cannot find the file for authentication.";
-			return false;
-		}
-		string Role = "none";
-		string line;
-		string storedId, storedRole, storedUserName, storedEmail, storedPassword, storedPhoneNumber, storedAge, storedBalance, storedIsActive;
-		while (getline(file, line)) {
-			stringstream recordLine(line);
-
-			getline(recordLine, storedId, ',');
-			getline(recordLine, storedRole, ',');
-			getline(recordLine, storedUserName, ',');
-			getline(recordLine, storedEmail, ',');
-			getline(recordLine, storedPassword, ',');
-			getline(recordLine, storedPhoneNumber, ',');
-			getline(recordLine, storedAge, ','); 
-			getline(recordLine, storedBalance, ',');
-			getline(recordLine, storedIsActive, ',');
-
-			if (Email == storedEmail&&Password==storedPassword) {
-				Role = storedRole;
-				file.close();
-				break;
-			}
-		}
-		if (Role == "none") {
-			cout << "\n Invalid Email or Password.";
-			file.close();
-			return false;
-		}
-
-		if (Role == "customer"||Role=="Customer") {
-			Customer loginCustomer;
-			loginCustomer.loadFromDatabase(storedId);
-			loginCustomer.customerMenu();
-			return true;
-		}
-		else if (Role == "admin" || Role == "Admin") {
-			Admin loginAdmin;
-			loginAdmin.loadFromDatabase(storedId);
-			loginAdmin.adminMenu();
-			return true;
-		}
-		else {
-			cout << "\n Invalid Authentication Token, you are not allowed to Enter The Bank System.";
-			return false;
-		}
-	}
-};
 int main() {
+
 	Bank B1;
 	B1.authenticateUser();
 

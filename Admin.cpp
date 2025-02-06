@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 
-
 	Admin::Admin() {}
 
 	//The admin will be able to read, create, updateand delete user's accounts.
@@ -229,6 +228,7 @@
 				}
 				accounts[i].setIsActive(false);
 				cout << "\n" << accounts[i].getUserName() << " Account's is deactivated ";
+				accounts[i].updateThisInDatabase();
 				return true;
 			}
 		}
@@ -245,6 +245,7 @@
 				}
 				accounts[i].setIsActive(true);
 				cout << "\n" << accounts[i].getUserName() << " Account's is Aactivated ";
+				accounts[i].updateThisInDatabase();
 				return true;
 			}
 		}

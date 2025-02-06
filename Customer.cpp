@@ -13,8 +13,10 @@ void Customer::addRelatedAccount()
 void Customer :: customerMenu() {
 	int choice = 0;
 	while (choice != 5) {
+		cout << "\n----------------\n" 
+			<< "CUSTOMER MENU:\n";
 		displayAccountInfo();
-		cout << "CUSTOMER MENU:"
+			cout<<"\n\noperations: "
 			<< "\n1. Deposit money"
 			<< "\n2. Withdraw money"
 			<< "\n3. Update Accounts' info"

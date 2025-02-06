@@ -83,7 +83,7 @@ void Account:: saveToDatabase()const {
 		cout << "\n ERROR : users database, Cannot open file to save the user's data..";
 		return;
 	}
-	file << id << "," << role << "," << userName << "," << email << "," << password << "," << phoneNumber << "," << age << "," << balance << "," << (isActive ? "Active" : "Inactive") << "\n";
+	file << to_string(getId()) << "," << getRole() << "," << getUserName() << "," << getEmail() << "," << getPassword() << "," << getPhoneNumber() << "," << getAge() << "," << getBalance() << "," << (getIsActive() ? "Active" : "Inactive") << "\n";
 	file.close();
 	cout << "\n Users Database: Account saved successfully..";
 }
@@ -107,24 +107,32 @@ void Account:: loadFromDatabase(const string& accountId) {
 		bool IsActive;
 		string Balance;
 
-		if (currentId == accountId) {
+		if (currentId == accountId) { //ASK : is it right to use private memebers directly here?
+			id = stoi(accountId);
 			getline(recordLine, Role, ',');
-			setRole(Role);
+			//setRole(Role);
+			role = Role;
 			getline(recordLine, UserName, ',');
-			setUserName(UserName);
+			//setUserName(UserName);
+			userName = UserName;
 			getline(recordLine, Email, ',');
-			setEmail(Email);
+			//setEmail(Email);
+			email = Email;
 			getline(recordLine, Password, ',');
-			setPassword(Password);
+			//setPassword(Password);
+			password = Password;
 			getline(recordLine, PhoneNumber, ',');
-			setPhoneNumber(PhoneNumber);
+			//setPhoneNumber(PhoneNumber);
+			phoneNumber = PhoneNumber;
+			getline(recordLine, Age, ',');
+			//setAge(Age);
+			age = Age;
+			getline(recordLine, Balance, ',');
+			//setBalance(Balance);
+			balance = Balance;
 			getline(recordLine, column, ',');
-			setAge(Age);
-			getline(recordLine, column, ',');
-			setBalance(Balance);
-			getline(recordLine, column, ',');
-			IsActive = (column == "Active"); 
-			setIsActive(IsActive);
+			isActive = (column == "Active"); 
+			//setIsActive(IsActive);
 			file.close();
 			return;
 		}
@@ -133,32 +141,7 @@ void Account:: loadFromDatabase(const string& accountId) {
 	cout << "\n Users Database: Account not found..";
 }
 
-//static int idGenerator() {
-	//	fstream readFile("idFile.txt");
-	//	if (!readFile) {
-	//		cout << "\n idFile, Error: cannot open the file to generate a new id";
-	//		return 0;
-	//	}
-	//	string fileId;
-	//	
-	//	getline(readFile, fileId);
-	//	readFile.close();
-	//	
-	//	fstream writeFile("idFile.txt");
-	//	if (fileId == "") {		
-	//		writeFile << 00001;
-	//		return 1;
-	//	}
-	//	else {
-	//		getline(writeFile, fileId);
-	//		
-	//		int newNumId = stoi(fileId);
-	//		newNumId++;
-	//		writeFile << newNumId;
-	//		return newNumId;
-	//	}
-	//}
-int Account:: idGenerator() { // problem: increase the number by 4 each time!!!
+int Account:: idGenerator() { // ASK : increase the number by 4 each time!!!
 	int currentId = 0;
 	ifstream inFile("idFile.txt");
 	if (!inFile) {
@@ -210,17 +193,27 @@ void Account:: updateThisInDatabase() const {
 		string column;
 		int currentId;
 		getline(currentLine, column, ',');
+		if (column.empty() || all_of(column.begin(), column.end(), ::isspace)) {
+			cout << "\n an empty line skiped";
+			continue; // skip empty lines in text file
+		}
 		currentId = stoi(column);
-		//cout << "currentI" << currentId;
-		if (currentId == this->id) {
-			databaseLines[i] = to_string(this->id) + "," + this->role + "," + this->userName + "," + getEmail() + "," + getPassword() + "," + getPhoneNumber() + "," + getAge() + "," + getBalance() + "," + (getIsActive() ? "Active" : "Inactive");
+		if (currentId == this->getId()) {
+			databaseLines[i] = to_string(this->getId()) + "," +
+				this->getRole() + "," +
+				this->getUserName() + "," +
+				this->getEmail() + "," +
+				this->getPassword() + "," +
+				this->getPhoneNumber() + "," +
+				this->getAge() + "," +
+				this->getBalance() + "," +
+				(this->getIsActive() ? "Active" : "Inactive");
 			isFound = true;
 			break;
 		}
 	}
-	// TODO motdfajkd
 	if (!isFound) {
-		cerr << "\nAccount not found in the database for update" << endl;
+		cout << "\nAccount not found in the database to update it!" << endl;
 		return;
 	}
 	// return the updataed data to the userDatabase file ( edit the file)
@@ -228,7 +221,6 @@ void Account:: updateThisInDatabase() const {
 	if (outFile) {
 		for (int i = 0; i < databaseLines.size(); i++) {
 			outFile << databaseLines[i] << endl;
-
 		}
 		outFile.close();
 		cout << "\n Users Database: Account updateddd successfully..";
@@ -237,6 +229,46 @@ void Account:: updateThisInDatabase() const {
 		cout << "\n ERROR : users database, Cannot open file to update..";
 	}
 }
+
+void Account::deleteFromDatabase() const {
+	// Similar to updateDatabase, but remove the line instead of modifying it
+	vector<string> databaseLines;
+	ifstream inFile("usersDatabase.txt");
+
+	if (inFile) {
+		string line;
+		while (getline(inFile, line)) {
+			databaseLines.push_back(line);
+		}
+		inFile.close();
+	}
+
+	// Remove the line corresponding to the account ID
+	databaseLines.erase(remove_if(databaseLines.begin(), databaseLines.end(),
+		[&](const string& line) {
+			stringstream ss(line);
+			string idStr;
+			getline(ss, idStr, ',');
+
+			return stoi(idStr) == this->id;
+
+
+
+		}), databaseLines.end());
+
+	ofstream outFile("usersDatabase.txt", ios::trunc);
+	if (outFile) {
+		for (const string& line : databaseLines) {
+			outFile << line << endl;
+		}
+		outFile.close();
+		cout << "\n Users Database: Account deleted successfully..";
+	}
+	else {
+		cout << "\n ERROR : users database, Cannot open file to delete account..";
+	}
+}
+
 
 bool Account::doesAccountExist(const string& checkEmail)const {
 	ifstream file("usersDatabase.txt");
@@ -263,24 +295,6 @@ bool Account::doesAccountExist(const string& checkEmail)const {
 //END OF functions for the database
 	
 //validation
-
-//double Account::validateDoubleValue(const string& text) {
-//	while (true) {
-//
-//	double value;
-//	cout << text;
-//	cin >> value;
-//	if (cin.fail()) {
-//		cout << "\nInvalid input. Please enter a valid number."<<endl<<endl;
-//		cin.clear(); 
-//		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-//	}
-//	else {
-//		return value;
-//	}
-//	
-//	}
-//}
 template <typename T>
 T Account::getValidInput(const string& text) {
 	while (true) {
@@ -532,15 +546,14 @@ if (auditFile.is_open()) {
 		cout << "\n Audit file is not available in DisplayAccountInfo function.";
 	}
 	*/
-	cout <<endl<<endl << getUserName() << " Account info: \n"
-		<<"ID: #"<<getId()<<" \n"
+	cout << endl<<endl << getUserName() << " Account info: \n"
+		<< "ID: #" << getId() << " \n"
 		<< "Balance= [ " << getBalance() << " ]\n"
 		<< "Email : " << getEmail() << endl
 		<< "Password : " << getPassword() << endl
 		<< "PhoneNumber is :" << getPhoneNumber() << endl
 		<< "age is : " << getAge() << endl
-		<< "Status: " << (getIsActive() ? "Active" : "NOT Active")
-		<<"\n----------------\n";
+		<< "Status: " << (getIsActive() ? "Active" : "NOT Active");
 }
 
 void Account::withdraw(double amount) {
@@ -551,7 +564,6 @@ void Account::withdraw(double amount) {
 		return;
 	}
 	setBalance(to_string(doubleBalance - amount));
-	//updateThisInDatabase(); //FIXTHIS: abort() is called 
 	/*	if (auditFile.is_open()) {
 			auditFile << "\n- withrawed "<<amount<< " from "<< getUserName();
 		}
@@ -560,6 +572,7 @@ void Account::withdraw(double amount) {
 		}*/
 	cout << endl << amount << " is withdrew from account"
 		"\nAccount balance now: " << getBalance();
+	updateThisInDatabase(); //FIXTHIS: abort() is called 
 	break;
 	}
 }
@@ -570,13 +583,12 @@ void Account::deposit(double amount) {
 		return;
 	}
 	else if (amount > 100000) {
-		cout << "\n deposit failed, you have to visit the bank to deposit 100,00 or more.";
+		cout << "\n deposit failed, you have to visit the bank to deposit 100,000 or more.";
 		return;
 	}
 	double oldBalance = stod(getBalance());
 	double newBalance = oldBalance + amount;
 	setBalance(to_string(newBalance));
-	//updateThisInDatabase();
 	/*	if (auditFile.is_open()) {
 			auditFile << "\n- deposited " << amount << " to " << getUserName() <<" 's Account.";
 		}
@@ -585,15 +597,18 @@ void Account::deposit(double amount) {
 		}*/
 	cout << endl << amount << " was deposited to the account"
 		"\nAccount balance now: " << getBalance();
+	cout << "\n deposit funciton getId(): :" << getId();
+	updateThisInDatabase();
 
 }
 
 void Account::updateAccountInfo() {
+	cout << "\033[2J\033[1;1H";
 	int operationNumber = 0;
 	while (operationNumber != 5) {
 		displayAccountInfo();
-		cout << " UPDATE ACCOUNT'S INFO PANEL: "
-			<< "\n please choose what operation you want to apply by number: "
+		cout << "\n -------------------------"
+			"\n UPDATE ACCOUNT'S INFO PANEL: "
 			<< "\n1. Update User Name."
 			<< "\n2. Update Email. "
 			<< "\n3. Update Password."
@@ -613,10 +628,10 @@ void Account::updateAccountInfo() {
 				continue;
 			}
 			this->setUserName(newUserName);
-			//updateThisInDatabase();
 			string newValue = getUserName();
 			if (newValue != newUserName) cout << "\nUpdating User Name failed";
-			else cout << "\n User Name is Updated.";
+			else cout << "\n User Name is Updated.\n";
+			updateThisInDatabase(); 
 			break;
 			}
 		}break;
@@ -630,10 +645,10 @@ void Account::updateAccountInfo() {
 					continue;
 				}
 				this->setEmail(newEmail);
-				//updateThisInDatabase();
 				string newValue = getEmail();
 				if (newValue != newEmail) cout << "\nUpdating Email failed";
-				else cout << "\n Email is Updated";
+				else cout << "\n Email is Updated\n";
+				updateThisInDatabase();
 				break;
 			}
 		}break;
@@ -652,14 +667,14 @@ void Account::updateAccountInfo() {
 				getline(cin, confirmPassword);
 				if (newPassword == confirmPassword) {
 					this->setPassword(newPassword);
-					cout << "\n new Account's Password is: " << this->getPassword();
+					cout << "\n new Account's Password is: " << this->getPassword()<<endl;
 					break;
 				}
 				else {
 					cout << "\n the passwords you entered isn't match, try again..";
 					continue;
 				}
-				//updateThisInDatabase();
+				updateThisInDatabase();
 			} 
 		}break;
 		case 4: {
@@ -672,10 +687,10 @@ void Account::updateAccountInfo() {
 					continue;
 				}
 				this->setPhoneNumber(newPhoneNumber);
-				//updateThisInDatabase();
 				string newValue = getPhoneNumber();
 				if (newValue != newPhoneNumber) cout << "\nUpdating Phone Number failed";
-				else cout << "\n Phone Number is Updated.";
+				else cout << "\n Phone Number is Updated.\n";
+				updateThisInDatabase();
 				break;
 			}
 		}break;

@@ -31,6 +31,8 @@ public:
 	int idGenerator();
 	void updateThisInDatabase() const;
 	bool doesAccountExist(const string& checkName)const;
+	void deleteFromDatabase() const;
+
 
 	//validation
 	template<typename T>
