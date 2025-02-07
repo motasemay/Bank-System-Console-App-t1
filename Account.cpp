@@ -110,29 +110,21 @@ void Account:: loadFromDatabase(const string& accountId) {
 		if (currentId == accountId) { //ASK : is it right to use private memebers directly here?
 			id = stoi(accountId);
 			getline(recordLine, Role, ',');
-			//setRole(Role);
-			role = Role;
+			setRoleForced(Role);
 			getline(recordLine, UserName, ',');
-			//setUserName(UserName);
-			userName = UserName;
+			setUserNameForced(UserName);
 			getline(recordLine, Email, ',');
-			//setEmail(Email);
-			email = Email;
+			setEmailForced(Email);
 			getline(recordLine, Password, ',');
-			//setPassword(Password);
-			password = Password;
+			setPasswordForced(Password);
 			getline(recordLine, PhoneNumber, ',');
-			//setPhoneNumber(PhoneNumber);
-			phoneNumber = PhoneNumber;
+			setPhoneNumberForced(PhoneNumber);
 			getline(recordLine, Age, ',');
-			//setAge(Age);
-			age = Age;
+			setAgeForced(Age);
 			getline(recordLine, Balance, ',');
-			//setBalance(Balance);
-			balance = Balance;
+			setBalanceForced(Balance);
 			getline(recordLine, column, ',');
-			isActive = (column == "Active"); 
-			//setIsActive(IsActive);
+			setIsActiveForced((column == "Active"));
 			file.close();
 			return;
 		}
@@ -194,7 +186,6 @@ void Account:: updateThisInDatabase() const {
 		int currentId;
 		getline(currentLine, column, ',');
 		if (column.empty() || all_of(column.begin(), column.end(), ::isspace)) {
-			cout << "\n an empty line skiped";
 			continue; // skip empty lines in text file
 		}
 		currentId = stoi(column);
@@ -231,41 +222,50 @@ void Account:: updateThisInDatabase() const {
 }
 
 void Account::deleteFromDatabase() const {
-	// Similar to updateDatabase, but remove the line instead of modifying it
 	vector<string> databaseLines;
 	ifstream inFile("usersDatabase.txt");
-
 	if (inFile) {
 		string line;
 		while (getline(inFile, line)) {
-			databaseLines.push_back(line);
+			databaseLines.push_back(line); 
 		}
 		inFile.close();
 	}
-
-	// Remove the line corresponding to the account ID
-	databaseLines.erase(remove_if(databaseLines.begin(), databaseLines.end(),
-		[&](const string& line) {
-			stringstream ss(line);
-			string idStr;
-			getline(ss, idStr, ',');
-
-			return stoi(idStr) == this->id;
-
-
-
-		}), databaseLines.end());
-
-	ofstream outFile("usersDatabase.txt", ios::trunc);
+	else {
+		cout << "\n ERROR : users database, Cannot open file to update..";
+		return;
+	}
+	bool isFound = false;
+	for (int i = 0; i < databaseLines.size(); ++i) {
+		stringstream currentLine(databaseLines[i]);
+		string column;
+		int currentId;
+		getline(currentLine, column, ',');
+		if (column.empty() || all_of(column.begin(), column.end(), ::isspace)) {
+			cout << "\n an empty line skiped";
+			continue; // skip empty lines in text file
+		}
+		currentId = stoi(column);
+		if (currentId == this->getId()) {
+			databaseLines.erase(databaseLines.begin() + i);
+			isFound = true;
+			break;
+		}
+	}
+	if (!isFound) {
+		cout << "\n UsersDatabase: Account not found in the database to Delete it!" << endl;
+		return;
+	}
+	ofstream outFile("usersDatabase.txt", ios::trunc); 
 	if (outFile) {
-		for (const string& line : databaseLines) {
-			outFile << line << endl;
+		for (int i = 0; i < databaseLines.size(); i++) {
+			outFile << databaseLines[i] << endl;
 		}
 		outFile.close();
-		cout << "\n Users Database: Account deleted successfully..";
+		cout << "\n Users Database: Account Deletted successfully..";
 	}
 	else {
-		cout << "\n ERROR : users database, Cannot open file to delete account..";
+		cout << "\n ERROR : users database, Cannot open file to Delete from it!";
 	}
 }
 
@@ -441,7 +441,48 @@ bool Account::roleValidation(const string& Role) {
 	return true;
 }
 
-//SETTRS
+//SETTRS with out validation (for database loading)
+void Account::setIdForced(int Id) {
+	id = Id;
+}
+
+void Account::setRoleForced(const string& Role) {
+	role = Role;
+}
+
+void Account::setUserNameForced(const string& UserName) {
+	userName = UserName;
+}
+
+void Account::setEmailForced(const string& Email) {
+	email = Email;
+}
+
+void Account::setPasswordForced(const string& Password) {
+	password = Password;
+}
+
+void Account::setPhoneNumberForced(const string& PhoneNumber) {
+	phoneNumber=PhoneNumber;
+}
+
+void Account::setAgeForced(const string& Age) {
+	age = Age;
+}
+
+void Account::setBalanceForced(const string& Balance) {
+	balance = Balance;
+}
+
+void Account::setIsActiveForced(bool IsActive) {
+	isActive = IsActive;
+}
+
+//SETTERS
+void Account::setId(int Id) {
+	id = Id;
+}
+
 void Account::setRole(const string& Role) {
 	if (roleValidation(Role))
 		role = Role;
@@ -553,7 +594,7 @@ if (auditFile.is_open()) {
 		<< "Password : " << getPassword() << endl
 		<< "PhoneNumber is :" << getPhoneNumber() << endl
 		<< "age is : " << getAge() << endl
-		<< "Status: " << (getIsActive() ? "Active" : "NOT Active");
+		<< "Status: " << (getIsActive() ? "Active" : "Inactive");
 }
 
 void Account::withdraw(double amount) {
@@ -583,7 +624,7 @@ void Account::deposit(double amount) {
 		return;
 	}
 	else if (amount > 100000) {
-		cout << "\n deposit failed, you have to visit the bank to deposit 100,000 or more.";
+		cout << "\n deposit failed!, you have to visit the bank to deposit 100,000 or more.";
 		return;
 	}
 	double oldBalance = stod(getBalance());
@@ -597,7 +638,6 @@ void Account::deposit(double amount) {
 		}*/
 	cout << endl << amount << " was deposited to the account"
 		"\nAccount balance now: " << getBalance();
-	cout << "\n deposit funciton getId(): :" << getId();
 	updateThisInDatabase();
 
 }

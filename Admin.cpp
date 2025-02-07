@@ -4,7 +4,50 @@
 
 	Admin::Admin() {}
 
-	//The admin will be able to read, create, updateand delete user's accounts.
+	void Admin::loadAllAccountsFromDatabase() {
+		accounts.clear(); 
+		ifstream file("usersDatabase.txt");
+		if (!file) {
+			cout << "\n ERROR: users database, cannot open file to Load accounts data." << endl;
+			return;
+		}
+		string line;
+		while (getline(file, line)) {
+			stringstream recordLine(line);
+			string column;
+			string accountIdStr;
+
+			if (getline(recordLine, accountIdStr, ',')) { // not read the empty lines
+					int accountId = stoi(accountIdStr); 
+					string Role, UserName, Email, Password, PhoneNumber, Age, Balance, IsActiveStr;
+					getline(recordLine, Role, ',');
+					getline(recordLine, UserName, ',');
+					getline(recordLine, Email, ',');
+					getline(recordLine, Password, ',');
+					getline(recordLine, PhoneNumber, ',');
+					getline(recordLine, Age, ',');
+					getline(recordLine, Balance, ',');
+					getline(recordLine, IsActiveStr, ',');
+
+					bool IsActive = (IsActiveStr == "Active");
+					Account account;
+
+					account.setRoleForced(Role);
+					account.setUserNameForced(UserName);
+					account.setEmailForced(Email);
+					account.setPasswordForced(Password);
+					account.setPhoneNumberForced(PhoneNumber);
+					account.setAgeForced(Age);
+					account.setBalanceForced(Balance);
+					account.setIsActiveForced(IsActive);
+					account.setIdForced(accountId);
+
+					accounts.push_back(account);
+			}
+		}
+		file.close();
+	}
+
 	void Admin:: createNewAccount() {
 		Account newAccount;
 		string newRole;
@@ -127,6 +170,7 @@
 	}
 
 	bool Admin::displayInfoForAccount(const string& accountEmail) {
+		loadAllAccountsFromDatabase();
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				accounts[i].displayAccountInfo();
@@ -138,11 +182,14 @@
 	}
 
 	bool Admin:: deleteAccount(const string& accountEmail) {
+		loadAllAccountsFromDatabase();
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				string tempUserName = accounts[i].getUserName();
+				accounts[i].deleteFromDatabase();
 				accounts.erase(accounts.begin() + i);
-				cout << "\n" << tempUserName << " Account's is deleted X \n";
+				cout << "\n" << tempUserName << " Account's is Deleted\n";
+				
 				return true;
 			}
 		}
@@ -151,6 +198,7 @@
 	}
 
 	bool Admin::updateAccount(const string& accountEmail) {
+		loadAllAccountsFromDatabase();
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				accounts[i].updateAccountInfo();
@@ -163,8 +211,8 @@
 	}
 
 	bool Admin::withdrawFromAccount(const string& accountEmail) {
+		loadAllAccountsFromDatabase();
 		double amount; 
-
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				amount=getValidInput<int>("\n how much you want to withdraw:");
@@ -178,12 +226,12 @@
 	}
 
 	bool Admin::depositToAccount(const string& accountEmail) {
+		loadAllAccountsFromDatabase();
 		double amount; 
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				amount=getValidInput<int>("\n how much you want to deposit: ");
 				accounts[i].deposit(amount);
-				//FIXTHIS: cout << "\n" << amount << " is deposited to " << accounts[i].getUserName() << "'s Account";
 				return true;
 			}
 		}
@@ -191,9 +239,10 @@
 		return false;
 	}
 
-	void Admin::displayActiveAccounts()const {
+	void Admin::displayActiveAccounts() {
+		loadAllAccountsFromDatabase();
 		int counter = 1;
-		cout << "\n Active Accounts: {\n ";
+		cout << "\n Active Accounts: \n{\n ";
 		if (accounts.size() != 0) {
 			cout << "  " << " NAME ," <<" ID ," << "   EMAIL ,  " << "   BALANCE ,  " << " ROLE , " << "  PHONE NUMBER , " << "  AGE , " << " STATUS  ";
 		}
@@ -202,12 +251,13 @@
 			cout << endl << counter << "." << accounts[i].getUserName() << "  " <<" #"<<accounts[i].getId() << "  " << accounts[i].getEmail() << "  " << accounts[i].getBalance()<< "  " << accounts[i].getRole() << "  " << accounts[i].getPhoneNumber()<<"     "<<accounts[i].getAge() <<"    " << (accounts[i].getIsActive() == true ? "Active" : "INactive");
 			counter++;
 		}
-		cout << " }\n";
+		cout << " \n}\n";
 	}
 
-	void Admin::displayInactiveAccounts()const {
+	void Admin::displayInactiveAccounts() {
+		loadAllAccountsFromDatabase();
 		int counter = 1;
-		cout << "\n Inactive Accounts: {\n ";
+		cout << "\n Inactive Accounts:\n {\n ";
 		if (accounts.size() != 0) {
 			cout << "  " << " NAME ," << " ID ," << "   EMAIL ,  " << "   BALANCE ,  " << " ROLE , " << "  PHONE NUMBER , " << "  AGE , " << " STATUS  ";
 		}
@@ -216,10 +266,11 @@
 			cout << endl << counter << "." << accounts[i].getUserName() << "  " <<accounts[i].getEmail() << "  " << accounts[i].getPhoneNumber();
 			counter++;
 		}
-		cout << " }\n";
+		cout << " \n}\n";
 	}
 
 	bool Admin::deactivateAccount(const string& accountEmail) {
+		loadAllAccountsFromDatabase();
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				if (accounts[i].getIsActive() == false) {
@@ -237,6 +288,7 @@
 	}
 
 	bool Admin::activateAccount(const string& accountEmail) {
+		loadAllAccountsFromDatabase();
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				if (accounts[i].getIsActive() == true) {

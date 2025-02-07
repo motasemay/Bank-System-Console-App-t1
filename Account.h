@@ -45,7 +45,19 @@ public:
 	bool balanceValidation(const string& Balance);
 	bool roleValidation(const string& Role);
 	
+	//SETTRS with out validation (for database loading)
+	void setIdForced(int Id);
+	void setRoleForced(const string& Role);
+	void setUserNameForced(const string& UserName);
+	void setEmailForced(const string& Email);
+	void setPasswordForced(const string& Password);
+	void setPhoneNumberForced(const string& PhoneNumber);
+	void setAgeForced(const string& Age);
+	void setBalanceForced(const string& Balance);
+	void setIsActiveForced(bool IsActive);
+
 	//SETTERS
+	void setId(int Id);
 	void setRole(const string& Role);
 	void setUserName(const string& UserName);
 	void setEmail(const string& Email);
