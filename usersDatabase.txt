@@ -1,6 +1,4 @@
-
-249,customer,motasemcustomer,mc,mc,0568676250,25,260.000000,Active
-250,admin,motasemadmin,ma,ma,0568676250,25,50000,Active
-262,customer,motasemtest,test@gmail.com,motasemay,0568676250,25,1.000000,Active
-265,admin,testtest,testtest@gmail.com,motasemay,0568676250,26,22,Active
-267,admin,testtesttest,testt@g,motasemay,0568676250,15,15,Active
+1395,customer,motasem,m@gmail.com,motasemay,0568676250,25,Main,20000,Active
+1398,customer,mohab,n@gmail.com,motasemay,0568676250,25,Main,20120,Active
+1403,customer,smai,s@gmail.com,motasemay,0568676250,22,Main,30000,Active
+1426,customer,skkk,sk@gmail.com,motasemay,0568676250,25,Main,25,Active

@@ -14,7 +14,8 @@ class Customer : public Account {
 public:
 	void addRelatedAccount();
 	void customerMenu();
-};
+	void loadRelatedAccounts(const string& customerEmail);
+};	
 
 #endif 
 

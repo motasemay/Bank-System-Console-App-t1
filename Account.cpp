@@ -18,6 +18,7 @@ Account::Account() {
 	age = "";
 	balance = "0.00";
 	isActive = true;
+	accountTypeName = "Main";
 	//saveToDatabase();
 //	auditFile.open("audit.txt", ios::app);
 //	if (!auditFile)
@@ -36,6 +37,7 @@ Account::Account(const string& newBalance) {
 	age = "";
 	setBalance(newBalance);
 	isActive = true;
+	setAccountTypeName("Main");
 	//saveToDatabase();
 
 	/*auditFile.open("audit.txt", ios::app);
@@ -46,7 +48,7 @@ Account::Account(const string& newBalance) {
 		*/
 }
 
-Account::Account(const string& newUserName, const string& newEmail, const string& newPassword, const string& newPhoneNumber, const string& newAge, const string& newBalance, const string& newRole) {
+Account::Account(const string& newUserName, const string& newEmail, const string& newPassword, const string& newPhoneNumber, const string& newAge, const string& newBalance, const string& newRole,const string& newAccountTypeName) {
 	id = idGenerator();
 	setRole("customer");
 	setUserName(newUserName);
@@ -56,6 +58,7 @@ Account::Account(const string& newUserName, const string& newEmail, const string
 	setAge(newAge);
 	setBalance(newBalance);
 	setIsActive(true);
+	setAccountTypeName(newAccountTypeName);
 	//	saveToDatabase();
 
 	/*	auditFile.open("audit.txt", ios::app);
@@ -83,7 +86,7 @@ void Account:: saveToDatabase()const {
 		cout << "\n ERROR : users database, Cannot open file to save the user's data..";
 		return;
 	}
-	file << to_string(getId()) << "," << getRole() << "," << getUserName() << "," << getEmail() << "," << getPassword() << "," << getPhoneNumber() << "," << getAge() << "," << getBalance() << "," << (getIsActive() ? "Active" : "Inactive") << "\n";
+	file << to_string(getId()) << "," << getRole() << "," << getUserName() << "," << getEmail() << "," << getPassword() << "," << getPhoneNumber() << "," << getAge() << "," << getAccountTypeName() << "," << getBalance() << "," << (getIsActive() ? "Active" : "Inactive") << "\n";
 	file.close();
 	cout << "\n Users Database: Account saved successfully..";
 }
@@ -100,12 +103,16 @@ void Account:: loadFromDatabase(const string& accountId) {
 		stringstream recordLine(line);
 		string column;
 		string currentId;
-		getline(recordLine, column, ',');
+
+		if (!getline(recordLine, column, ',')) {
+			cout << "\n SKIPED FILE PROPLEM";
+		}
 		currentId = column;
 		string Role, UserName, Email, Password, PhoneNumber;
 		string Age;
 		bool IsActive;
 		string Balance;
+		string AccountTypeName;
 
 		if (currentId == accountId) { //ASK : is it right to use private memebers directly here?
 			id = stoi(accountId);
@@ -121,10 +128,13 @@ void Account:: loadFromDatabase(const string& accountId) {
 			setPhoneNumberForced(PhoneNumber);
 			getline(recordLine, Age, ',');
 			setAgeForced(Age);
+			getline(recordLine, AccountTypeName, ',');
+			setAccountTypeNameForced(AccountTypeName);
 			getline(recordLine, Balance, ',');
 			setBalanceForced(Balance);
 			getline(recordLine, column, ',');
 			setIsActiveForced((column == "Active"));
+
 			file.close();
 			return;
 		}
@@ -197,6 +207,7 @@ void Account:: updateThisInDatabase() const {
 				this->getPassword() + "," +
 				this->getPhoneNumber() + "," +
 				this->getAge() + "," +
+				this->getAccountTypeName() + "," +
 				this->getBalance() + "," +
 				(this->getIsActive() ? "Active" : "Inactive");
 			isFound = true;
@@ -242,7 +253,6 @@ void Account::deleteFromDatabase() const {
 		int currentId;
 		getline(currentLine, column, ',');
 		if (column.empty() || all_of(column.begin(), column.end(), ::isspace)) {
-			cout << "\n an empty line skiped";
 			continue; // skip empty lines in text file
 		}
 		currentId = stoi(column);
@@ -478,6 +488,8 @@ void Account::setIsActiveForced(bool IsActive) {
 	isActive = IsActive;
 }
 
+void Account::setAccountTypeNameForced(const string& accTypeName) { accountTypeName = accTypeName; }
+
 //SETTERS
 void Account::setId(int Id) {
 	id = Id;
@@ -550,6 +562,11 @@ void Account::setIsActive(bool IsActive) {
 	isActive = IsActive;
 }
 
+void Account::setAccountTypeName(const string& accTypeName) { 
+	accountTypeName = accTypeName;
+}
+
+
 //GETTERS
 int Account::getId()const { return id; }
 string Account::getRole()const { return role; }
@@ -560,6 +577,7 @@ string Account::getPhoneNumber()const { return phoneNumber; }
 string Account::getAge()const { return age; }
 string Account::getBalance()const { return balance; }
 bool Account::getIsActive()const { return isActive; }
+string Account::getAccountTypeName() const { return accountTypeName; }
 
 /*
 void DisplayAuditFile()const {
@@ -579,17 +597,8 @@ void DisplayAuditFile()const {
 	}
 	*/
 void Account::displayAccountInfo() { 
-/*	
-if (auditFile.is_open()) {
-		auditFile << "\n- Displayed User Information for " << getUserName();
-	}
-	else {
-		cout << "\n Audit file is not available in DisplayAccountInfo function.";
-	}
-	*/
 	cout << endl<<endl << getUserName() << " Account info: \n"
 		<< "ID: #" << getId() << " \n"
-		<< "Balance= [ " << getBalance() << " ]\n"
 		<< "Email : " << getEmail() << endl
 		<< "Password : " << getPassword() << endl
 		<< "PhoneNumber is :" << getPhoneNumber() << endl

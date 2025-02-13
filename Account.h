@@ -20,10 +20,11 @@ private:
 	string age;
 	string balance;
 	bool isActive;
+	string accountTypeName;
 public:
 	Account();
 	Account(const string& newBalance);
-	Account(const string& newUserName, const string& newEmail, const string& newPassword, const string& newPhoneNumber, const string& newAge, const string& newBalance = "0.00", const string& newRole = "customer");
+	Account(const string& newUserName, const string& newEmail, const string& newPassword, const string& newPhoneNumber, const string& newAge, const string& newBalance = "0.00", const string& newRole = "customer",const string& newAccountTypeName="Main");
 	~Account();
 
 	void saveToDatabase()const;
@@ -55,6 +56,8 @@ public:
 	void setAgeForced(const string& Age);
 	void setBalanceForced(const string& Balance);
 	void setIsActiveForced(bool IsActive);
+	void setAccountTypeNameForced(const string& accTypeName);
+
 
 	//SETTERS
 	void setId(int Id);
@@ -66,6 +69,7 @@ public:
 	void setAge(const string& Age);
 	void setBalance(const string& Balance);
 	void setIsActive(bool IsActive);
+	void setAccountTypeName(const string& accTypeName);
 
 	//GETTERS
 	int getId()const;
@@ -77,6 +81,7 @@ public:
 	string getAge()const;
 	string getBalance()const;
 	bool getIsActive()const;
+	string getAccountTypeName() const;
 
 	void displayAccountInfo();
 	void withdraw(double amount);

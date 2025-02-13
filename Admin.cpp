@@ -19,7 +19,7 @@
 
 			if (getline(recordLine, accountIdStr, ',')) { // not read the empty lines
 					int accountId = stoi(accountIdStr); 
-					string Role, UserName, Email, Password, PhoneNumber, Age, Balance, IsActiveStr;
+					string Role, UserName, Email, Password, PhoneNumber, Age,AccountTypeName, Balance, IsActiveStr;
 					getline(recordLine, Role, ',');
 					getline(recordLine, UserName, ',');
 					getline(recordLine, Email, ',');
@@ -27,6 +27,7 @@
 					getline(recordLine, PhoneNumber, ',');
 					getline(recordLine, Age, ',');
 					getline(recordLine, Balance, ',');
+					getline(recordLine, AccountTypeName, ',');
 					getline(recordLine, IsActiveStr, ',');
 
 					bool IsActive = (IsActiveStr == "Active");
@@ -38,6 +39,7 @@
 					account.setPasswordForced(Password);
 					account.setPhoneNumberForced(PhoneNumber);
 					account.setAgeForced(Age);
+					account.setAccountTypeName(AccountTypeName);
 					account.setBalanceForced(Balance);
 					account.setIsActiveForced(IsActive);
 					account.setIdForced(accountId);
@@ -146,6 +148,8 @@
 		}
 		cout << "\n new Account's age: " << newAccount.getAge() << endl;
 
+		cout << "\n new Account's TypeName: " << newAccount.getAccountTypeName() << endl;
+
 		string test = "";
 		while (test != "Y" && test != "y") {
 			cout << "\n Enter the Balance you want it to be in the Account's: ";
@@ -154,7 +158,7 @@
 				cout << ", Try Again:";
 				continue;
 			}
-			cout << "\nCRITICAL OPERATION: \n	are you sure you want " << newAccount.getUserName() << " to have " << newBalance << " in his account? [Y] yes,(other inputs will considered no) : ";
+			cout << "\nCRITICAL OPERATION: \nare you sure you want " << newAccount.getUserName() << " to have " << newBalance << " in his account? [Y] yes,(other inputs will considered no) : ";
 			cin.ignore();
 			getline(cin, test);
 			if (test == "Y" || test == "y") {
@@ -183,17 +187,39 @@
 
 	bool Admin:: deleteAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		bool accountFound = false;
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
-				string tempUserName = accounts[i].getUserName();
-				accounts[i].deleteFromDatabase();
-				accounts.erase(accounts.begin() + i);
-				cout << "\n" << tempUserName << " Account's is Deleted\n";
+				string mainUserName = accounts[i].getUserName();
+				accountFound = true;	
 				
-				return true;
+				string confirm;
+				cout << "\n Are you sure you want to delete " << mainUserName << "'s Account with " << accountEmail << " and all related Account's? (y:Yes, n:No): ";
+				getline(cin, confirm);
+				if (confirm == "y" || confirm == "Y") {
+					for (int j = 0; j < accounts.size(); j++) {
+						if (accounts[j].getEmail() == accountEmail){
+							accounts[j].deleteFromDatabase();
+
+							if (accounts[j].getUserName() == mainUserName) 
+								cout << "\n-" << mainUserName << "'s Account (Main) Deleted successfully\n";
+							else 
+								cout << "\n-" << accounts[j].getUserName() << "'s Account (Related) Deleted successfully\n";
+						}
+					}
+					accounts.erase(remove_if(accounts.begin(), accounts.end(),
+						[&](const Account& acc) { return acc.getEmail() == accountEmail; }),
+						accounts.end());
+					return true;
+				}
+				else {
+					cout << "\n Deletion Proccess CANCELED.."<<endl;
+					return false;
+				}
 			}
+
 		}
-		cout << "\n Delete :there is no Account with such an Email";
+		cout << "\n Delete :there is no Account with such an Email"<<endl;
 		return false;
 	}
 
@@ -244,11 +270,12 @@
 		int counter = 1;
 		cout << "\n Active Accounts: \n{\n ";
 		if (accounts.size() != 0) {
-			cout << "  " << " NAME ," <<" ID ," << "   EMAIL ,  " << "   BALANCE ,  " << " ROLE , " << "  PHONE NUMBER , " << "  AGE , " << " STATUS  ";
+			cout << "  " << " NAME ," <<" ID ," << "   EMAIL ,  " << "   ACCOUNT TYPE ,  " << "   BALANCE ,  " << " ROLE , " << "  PHONE NUMBER , " << "  AGE , " << " STATUS  ";
 		}
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getIsActive() == false) continue;
-			cout << endl << counter << "." << accounts[i].getUserName() << "  " <<" #"<<accounts[i].getId() << "  " << accounts[i].getEmail() << "  " << accounts[i].getBalance()<< "  " << accounts[i].getRole() << "  " << accounts[i].getPhoneNumber()<<"     "<<accounts[i].getAge() <<"    " << (accounts[i].getIsActive() == true ? "Active" : "INactive");
+			if (accounts[i].getRole() == "branch")continue;
+			cout << endl << counter << "." << accounts[i].getUserName() << "  " <<" #"<<accounts[i].getId() << "  " << accounts[i].getEmail() << "  " << accounts[i].getAccountTypeName() << "  " << accounts[i].getBalance()<< "  " << accounts[i].getRole() << "  " << accounts[i].getPhoneNumber()<<"     "<<accounts[i].getAge() <<"    " << (accounts[i].getIsActive() == true ? "Active" : "INactive");
 			counter++;
 		}
 		cout << " \n}\n";
@@ -263,7 +290,8 @@
 		}
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getIsActive() == true) continue;
-			cout << endl << counter << "." << accounts[i].getUserName() << "  " <<accounts[i].getEmail() << "  " << accounts[i].getPhoneNumber();
+			if (accounts[i].getRole() == "branch")continue;
+			cout << endl << counter << "." << accounts[i].getUserName() << "  " << " #" << accounts[i].getId() << "  " << accounts[i].getEmail() << "  " << accounts[i].getAccountTypeName() << "  " << accounts[i].getBalance() << "  " << accounts[i].getRole() << "  " << accounts[i].getPhoneNumber() << "     " << accounts[i].getAge() << "    " << (accounts[i].getIsActive() == true ? "Active" : "INactive");
 			counter++;
 		}
 		cout << " \n}\n";
