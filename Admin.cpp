@@ -50,6 +50,16 @@
 		file.close();
 	}
 
+	bool Admin::isAllowedOperation(const string& targetEmail) {
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getEmail() == targetEmail) {
+				if (accounts[i].getRole() == "branch")continue;
+				return accounts[i].getRole() == "customer";
+			}
+		}
+		return false;
+	}
+
 	void Admin:: createNewAccount() {
 		Account newAccount;
 		string newRole;
@@ -187,6 +197,10 @@
 
 	bool Admin:: deleteAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!isAllowedOperation(accountEmail)) {
+			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+			return false;
+		}
 		bool accountFound = false;
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
@@ -204,7 +218,7 @@
 							if (accounts[j].getUserName() == mainUserName) 
 								cout << "\n-" << mainUserName << "'s Account (Main) Deleted successfully\n";
 							else 
-								cout << "\n-" << accounts[j].getUserName() << "'s Account (Related) Deleted successfully\n";
+								cout << "\n-" << mainUserName << "'s Related Account Deleted successfully\n";
 						}
 					}
 					accounts.erase(remove_if(accounts.begin(), accounts.end(),
@@ -225,6 +239,10 @@
 
 	bool Admin::updateAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!isAllowedOperation(accountEmail)) {
+			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+			return false;
+		}
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				accounts[i].updateAccountInfo();
@@ -238,6 +256,10 @@
 
 	bool Admin::withdrawFromAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!isAllowedOperation(accountEmail)) {
+			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+			return false;
+		}
 		double amount; 
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
@@ -253,10 +275,14 @@
 
 	bool Admin::depositToAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
-		double amount; 
+		if (!isAllowedOperation(accountEmail)) {
+			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+			return false;
+		}
+		double amount;
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
-				amount=getValidInput<int>("\n how much you want to deposit: ");
+				amount = getValidInput<int>("\n how much you want to deposit: ");
 				accounts[i].deposit(amount);
 				return true;
 			}
@@ -299,6 +325,10 @@
 
 	bool Admin::deactivateAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!isAllowedOperation(accountEmail)) {
+			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+			return false;
+		}
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				if (accounts[i].getIsActive() == false) {
@@ -317,6 +347,10 @@
 
 	bool Admin::activateAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!isAllowedOperation(accountEmail)) {
+			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+			return false;
+		}
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				if (accounts[i].getIsActive() == true) {
@@ -337,7 +371,6 @@
 		int choise = 0;
 		while (choise != 11) {
 			cout << "\n---------";
-
 			displayActiveAccounts();
 			displayInactiveAccounts();
 			cout << "\n Admin Menu: "
@@ -351,7 +384,7 @@
 				<< "\n8.Display InActive Accounts"
 				<< "\n9.Deactivate An Account."
 				<< "\n10.Activate An Account."
-				<< "\n11. CLOSE This Menu";
+				<< "\n11. Log Out.";
 			choise = getValidInput<int>("\n choose the operation: ");
 			switch (choise) {
 			case 1: {
@@ -362,7 +395,9 @@
 				while (true) {
 					cout << "\n Enter the Email for the Account to DISPLAY its Info: ";
 					getline(cin, searchEmail);
-					if (searchEmail == "stop")break;
+					if (searchEmail == "stop") {
+						break;
+					}
 					if (!displayInfoForAccount(searchEmail)) {
 						cout << ", Try again, or write \"stop\": ";
 						continue;
@@ -376,7 +411,10 @@
 				while (true) {
 					cout << "\n Enter the Email for the Account to DELETE: ";
 					getline(cin, searchEmail);
-					if (searchEmail == "stop")break;
+					if (searchEmail == "stop") {
+						cout << "\033[2J\033[1;1H";
+						break;
+					}
 					if (!deleteAccount(searchEmail)) {
 						cout << ", Try Again, or write \"stop\" : ";
 						continue;
@@ -389,7 +427,10 @@
 				while (true) {
 					cout << "\n Enter the Email for the Account to UPDATE: ";
 					getline(cin, searchEmail);
-					if (searchEmail == "stop")break;
+					if (searchEmail == "stop") {
+						cout << "\033[2J\033[1;1H";
+						break;
+					}
 					if (!updateAccount(searchEmail)) {
 						cout << ", Try Again, or write \"stop\" : ";
 						continue;
@@ -402,7 +443,10 @@
 				while (true) {
 					cout << "\n Enter the Email for the Account to WITHDRAW from: ";
 					getline(cin, searchEmail);
-					if (searchEmail == "stop")break;
+					if (searchEmail == "stop") {
+						cout << "\033[2J\033[1;1H";
+						break;
+					}
 					if (!withdrawFromAccount(searchEmail)) {
 						cout << ", Try Again, or write \"stop\" : ";
 						continue;
@@ -415,7 +459,10 @@
 				while (true) {
 					cout << "\n Enter the Email for the Account to DEPOSIT to it: ";
 					getline(cin, searchEmail);
-					if (searchEmail == "stop")break;
+					if (searchEmail == "stop"){
+						cout << "\033[2J\033[1;1H";
+						break;
+					}
 					if (!depositToAccount(searchEmail)) {
 						cout << ", Try Again, or write \"stop\" : ";
 						continue;
@@ -434,7 +481,10 @@
 				while (true) {
 					cout << "\n Enter the Email for the Account to DEACTIVATE it: ";
 					getline(cin, searchEmail);
-					if (searchEmail == "stop")break;
+					if (searchEmail == "stop") {
+						cout << "\033[2J\033[1;1H";
+						break; 
+					}
 					if (!deactivateAccount(searchEmail)) {
 						cout << ", Try again or write \"stop\": ";
 						continue;
@@ -447,7 +497,10 @@
 				while (true) {
 					cout << "\n Enter the Email for the Account to ACTIVATE it: ";
 					getline(cin, searchEmail);
-					if (searchEmail == "stop")break;
+					if (searchEmail == "stop") {
+						cout << "\033[2J\033[1;1H";
+						break;
+					}
 					if (!activateAccount(searchEmail)) {
 						cout << ", Try again or write \"stop\": ";
 						continue;

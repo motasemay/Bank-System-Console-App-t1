@@ -30,6 +30,18 @@ void Customer::addRelatedAccount() {
 	cout << "\nAccount added successfully!" << endl;
 }
 
+void Customer::displayCustomerRelatedAccounts()const {
+	if (!customerAccounts.empty()) {
+		cout << "\n" << getUserName() << " Accounts:" << endl;
+		for (int i = 0; i < customerAccounts.size(); ++i) {
+			cout << i + 1 << ". " << customerAccounts[i].getAccountTypeName()
+				<< " (Current Balance: " << customerAccounts[i].getBalance() << ")" << endl;
+		}
+	}
+	else {
+		cout << "\nYou have no accounts yet. Please add an account first." << endl;
+	}
+}
 
 void Customer :: customerMenu() {
 	int choice = 0;
@@ -37,36 +49,20 @@ void Customer :: customerMenu() {
 		cout << "\n----------------\n" 
 			<< "CUSTOMER MENU:\n";
 		displayAccountInfo();
+		displayCustomerRelatedAccounts();
 		int accountIndex = -1;
-		if (!customerAccounts.empty()) {
-			cout << "\n\n" << getUserName() << " Accounts:" << endl;
-			for (int i = 0; i < customerAccounts.size(); ++i) {
-				cout << i + 1 << ". " << customerAccounts[i].getAccountTypeName()
-					<< " (Balance: " << customerAccounts[i].getBalance() << ")" << endl;
-			}
-			cout<<"\n\noperations: "
+			cout<<"\nOperations: "
 			<< "\n1. Deposit money"
 			<< "\n2. Withdraw money"
 			<< "\n3. Add New Relative Account"
 			<< "\n4. Update Accounts' info"
 			<< "\n5. View audit file"
-			<< "\n6. stop";
-		}
-		else {
-			cout << "\nYou have no accounts yet. Please add an account first." << endl;
-			break;
-		}
-
+			<< "\n6. Log Out";
+		
 		choice = getValidInput<int>("\n choose operation number: ");
 		switch (choice) {
 		case 1: {
-			if (!customerAccounts.empty()) {
-				cout << "\n" << getUserName() << " Accounts:" << endl;
-				for (int i = 0; i < customerAccounts.size(); ++i) {
-					cout << i + 1 << ". " << customerAccounts[i].getAccountTypeName()
-						<< " (Balance: " << customerAccounts[i].getBalance() << ")" << endl;
-				}
-
+			displayCustomerRelatedAccounts();
 				while (accountIndex < 0 || accountIndex >= customerAccounts.size()) {
 					accountIndex = getValidInput<int>("\nSelect account (enter number): ") - 1;
 					if (accountIndex < 0 || accountIndex >= customerAccounts.size()) {
@@ -77,36 +73,19 @@ void Customer :: customerMenu() {
 				double depositAmount;
 				depositAmount = getValidInput<double>("\nEnter amount to deposit: ");
 				customerAccounts[accountIndex].deposit(depositAmount);
-			}
-			else {
-				cout << "\nYou have no accounts yet. Please add an account first." << endl;
-				break;
-			}
 			break;
 		}
 		case 2: {
-			if (!customerAccounts.empty()) {
-				cout << "\n" << getUserName() << " Accounts:" << endl;
-				for (int i = 0; i < customerAccounts.size(); ++i) {
-					cout << i + 1 << ". " << customerAccounts[i].getAccountTypeName()
-						<< " (Balance: " << customerAccounts[i].getBalance() << ")" << endl;
-				}
-
+			displayCustomerRelatedAccounts();
 				while (accountIndex < 0 || accountIndex >= customerAccounts.size()) {
 					accountIndex = getValidInput<int>("\nSelect account (enter number): ") - 1;
 					if (accountIndex < 0 || accountIndex >= customerAccounts.size()) {
 						cout << "\nInvalid account selection. Please try again." << endl;
 					}
 				}
-
 				double withdrawAmount;
 				withdrawAmount = getValidInput<double>("\nEnter amount to withdraw: ");
 				customerAccounts[accountIndex].withdraw(withdrawAmount);
-			}
-			else {
-				cout << "\nYou have no accounts yet. Please add an account first." << endl;
-				break;
-			}
 			break;
 		}
 		case 3: {
@@ -114,7 +93,7 @@ void Customer :: customerMenu() {
 			break;
 		}	
 		case 4: {
-			customerAccounts[accountIndex].updateAccountInfo();
+			updateAccountInfo();
 			break;
 		}
 		case 5: {

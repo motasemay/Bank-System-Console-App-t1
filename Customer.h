@@ -13,6 +13,7 @@ class Customer : public Account {
 	vector<Account> customerAccounts;
 public:
 	void addRelatedAccount();
+	void displayCustomerRelatedAccounts() const;
 	void customerMenu();
 	void loadRelatedAccounts(const string& customerEmail);
 };	

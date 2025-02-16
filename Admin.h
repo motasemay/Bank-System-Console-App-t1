@@ -11,6 +11,7 @@ private:
 public:
 	Admin();
 	void loadAllAccountsFromDatabase();
+	bool isAllowedOperation(const string& targetEmail);
 	void createNewAccount();
 	bool displayInfoForAccount(const string& accountPhoneNumber);
 	bool deleteAccount(const string& accountPhoneNumber);

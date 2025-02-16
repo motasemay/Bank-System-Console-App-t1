@@ -225,7 +225,7 @@ void Account:: updateThisInDatabase() const {
 			outFile << databaseLines[i] << endl;
 		}
 		outFile.close();
-		cout << "\n Users Database: Account updateddd successfully..";
+		cout << "\n Users Database: Account updateddd successfully..\n";
 	}
 	else {
 		cout << "\n ERROR : users database, Cannot open file to update..";
@@ -597,13 +597,13 @@ void DisplayAuditFile()const {
 	}
 	*/
 void Account::displayAccountInfo() { 
-	cout << endl<<endl << getUserName() << " Account info: \n"
+	cout <<endl << getUserName() << " Account info: \n"
 		<< "ID: #" << getId() << " \n"
 		<< "Email : " << getEmail() << endl
 		<< "Password : " << getPassword() << endl
 		<< "PhoneNumber is :" << getPhoneNumber() << endl
 		<< "age is : " << getAge() << endl
-		<< "Status: " << (getIsActive() ? "Active" : "Inactive");
+		<< "Status: " << (getIsActive() ? "Active" : "Inactive")<<endl;
 }
 
 void Account::withdraw(double amount) {
