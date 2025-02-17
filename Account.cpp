@@ -443,9 +443,9 @@ bool Account::roleValidation(const string& Role) {
 		cout << "\nInvalid Role, Cannot Be EMPTY!";
 		return false;
 	}
-	if (!(Role == "admin" || Role == "customer"))
+	if (!(Role == "admin" || Role == "customer"||Role=="superadmin"))
 	{
-		cout << "\n invalue Role value it must be (customer) or (admin) ";
+		cout << "\n invalue Role value it must be (customer) or (admin) or (superadmin) ";
 		return false;
 	}
 	return true;

@@ -13,6 +13,7 @@ public:
 	void loadAllAccountsFromDatabase();
 	bool isAllowedOperation(const string& targetEmail);
 	void createNewAccount();
+	bool updateAccountRole(const string& targetEmail, const string& newRole);
 	bool displayInfoForAccount(const string& accountPhoneNumber);
 	bool deleteAccount(const string& accountPhoneNumber);
 	bool updateAccount(const string& accountPhoneNumber);

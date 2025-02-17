@@ -183,6 +183,51 @@
 		cout << "\n new Account created successfully..\n\n";
 	}
 
+	bool Admin::updateAccountRole(const string& targetEmail, const string& newRole)
+	{
+		loadAllAccountsFromDatabase();
+		if (!isAllowedOperation(targetEmail)) {
+			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+			return false;
+		}
+		if (newRole == "superadmin") {
+			cout << "\n Unauthorized Operation, You Can't Give this Role!\n";
+			return false;
+		}
+		if (!roleValidation(newRole)) {
+			cout << "\n Unauthorized Operation, You Can't Give this Role!\n";
+			return false;
+		}
+		for (int i = 0; i < accounts.size(); i++) {
+			if (accounts[i].getEmail() == targetEmail) {
+				if (accounts[i].getRole() == "branch")continue;
+				if (accounts[i].getRole() == newRole) {
+					cout << "\n account is already a"<<newRole <<"!\n";
+					return false;
+				}
+				if (accounts[i].getRole() == "customer") {
+					string confirm="";
+					cout << "\n Critical Operation:\nAre You Sure you Want to give " << accounts[i].getUserName() << "'s Account\n"
+							<< "A " << newRole << " Role? (write Y or y to confirm) : ";
+					getline(cin, confirm);
+					if (confirm == "y" || confirm == "Y") {
+						accounts[i].setRoleForced(newRole);
+						accounts[i].updateThisInDatabase();
+						cout << endl << accounts[i].getUserName() << "'s Account with [" << accounts[i].getId() << "] id and [ " << accounts[i].getEmail() << " ] email \n"
+							<< " is Now a " << newRole << "..\n";
+						return true;
+					}
+					else {
+						cout << "\n Operation Canceled.\n";
+						return false;
+					}
+				}
+			}
+		}
+		cout << "\n Error, there is no account with ( " << targetEmail << " ) email in the system.\n";
+		return false;
+	}
+
 	bool Admin::displayInfoForAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
 		for (int i = 0; i < accounts.size(); i++) {
@@ -369,7 +414,7 @@
 
 	void Admin::adminMenu() {
 		int choise = 0;
-		while (choise != 11) {
+		while (choise != 12) {
 			cout << "\n---------";
 			displayActiveAccounts();
 			displayInactiveAccounts();
@@ -384,7 +429,8 @@
 				<< "\n8.Display InActive Accounts"
 				<< "\n9.Deactivate An Account."
 				<< "\n10.Activate An Account."
-				<< "\n11. Log Out.";
+				<< "\n11.Update A Customer Role."
+				<< "\n12. Log Out.";
 			choise = getValidInput<int>("\n choose the operation: ");
 			switch (choise) {
 			case 1: {
@@ -509,6 +555,22 @@
 				}  
 			}break;
 			case 11: {
+				string searchEmail;
+				while (true) {
+					cout << "\n Enter the Email for the Customer to Make him Admin: ";
+					getline(cin, searchEmail);
+					if (searchEmail == "stop") {
+						cout << "\033[2J\033[1;1H";
+						break;
+					}
+					if (!updateAccountRole(searchEmail,"admin")) {
+						cout << ", Try again or write \"stop\": ";
+						continue;
+					}
+					break;
+				}
+			}break;
+			case 12: {
 				cout << "stoped..\n----------------------------------";
 				cout << "\033[2J\033[1;1H";
 			}break;
