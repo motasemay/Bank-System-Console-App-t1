@@ -1,5 +1,4 @@
-1508,customer,motasem_ayyash,mm@gmail.com,motasemay,0568676250,25,Main,51.000000,Active
 1538,branch,,m@gmail.com,,,,Saving,10.000000,Active
-1702,admin,sami,sa@gmail.com,motasemay,0569999999,05,Main,200,Active
-1723,branch,,mm@gmail.com,,,,saving,200.000000,Active
+1702,superadmin,sami,sa@gmail.com,motasemay,0569999999,05,Main,200,Active
 1776,admin,mohannnnnnad,nn@gmail.com,motasemay,2222222222,100,Main,10000,Active
+1904,admin,cmot,mot@gmail.com,motasemay,0569676252,22,Main,50000,Active

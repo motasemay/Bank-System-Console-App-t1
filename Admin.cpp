@@ -183,7 +183,7 @@
 		cout << "\n new Account created successfully..\n\n";
 	}
 
-	bool Admin::updateAccountRole(const string& targetEmail, const string& newRole)
+	 bool Admin::updateAccountRole(const string& targetEmail, const string& newRole)
 	{
 		loadAllAccountsFromDatabase();
 		if (!isAllowedOperation(targetEmail)) {
@@ -240,7 +240,7 @@
 		return false;
 	}
 
-	bool Admin:: deleteAccount(const string& accountEmail) {
+	 bool Admin:: deleteAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
 		if (!isAllowedOperation(accountEmail)) {
 			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";

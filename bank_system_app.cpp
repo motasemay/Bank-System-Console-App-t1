@@ -4,6 +4,7 @@
 #include "Customer.h"
 #include "Admin.h"
 #include "Bank.h"
+#include "SuperAdmin.h"
 using namespace std;
 /*	if (auditfile.is_open()) {
 
@@ -111,6 +112,8 @@ void clearauditfile() {
 
 */
 int main() {
+	SuperAdmin s1;
+	s1.superAdminMenu();
 	Admin a1;
 	a1.adminMenu();
 	Bank B1;

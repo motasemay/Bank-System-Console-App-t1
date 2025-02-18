@@ -6,16 +6,16 @@
 #include<vector>
 
 class Admin :public Customer {
-private:
+protected:
 	vector<Account> accounts;
 public:
 	Admin();
 	void loadAllAccountsFromDatabase();
-	bool isAllowedOperation(const string& targetEmail);
+	virtual bool isAllowedOperation(const string& targetEmail);
 	void createNewAccount();
-	bool updateAccountRole(const string& targetEmail, const string& newRole);
+	virtual bool updateAccountRole(const string& targetEmail, const string& newRole);
 	bool displayInfoForAccount(const string& accountPhoneNumber);
-	bool deleteAccount(const string& accountPhoneNumber);
+	virtual bool deleteAccount(const string& accountPhoneNumber);
 	bool updateAccount(const string& accountPhoneNumber);
 	bool withdrawFromAccount(const string& accountPhoneNumber);
 	bool depositToAccount(const string& accountPhoneNumber);
