@@ -598,6 +598,7 @@ void DisplayAuditFile()const {
 	*/
 void Account::displayAccountInfo() { 
 	cout <<endl << getUserName() << " Account info: \n"
+		<<"Role: "<<getRole()<<" \n"
 		<< "ID: #" << getId() << " \n"
 		<< "Email : " << getEmail() << endl
 		<< "Password : " << getPassword() << endl
@@ -636,18 +637,25 @@ void Account::deposit(double amount) {
 		cout << "\n deposit failed!, you have to visit the bank to deposit 100,000 or more.";
 		return;
 	}
-	double oldBalance = stod(getBalance());
-	double newBalance = oldBalance + amount;
-	setBalance(to_string(newBalance));
-	/*	if (auditFile.is_open()) {
-			auditFile << "\n- deposited " << amount << " to " << getUserName() <<" 's Account.";
-		}
-		else {
-			cout << "\n Audit file is not available in withdraw function." << endl;
-		}*/
-	cout << endl << amount << " was deposited to the account"
-		"\nAccount balance now: " << getBalance();
-	updateThisInDatabase();
+	cout << "\n\n getBalance(): " << getBalance()<<endl<<endl;
+	try {
+		double oldBalance = stod(getBalance());
+		double newBalance = oldBalance + amount;
+		setBalance(to_string(newBalance));
+		/*	if (auditFile.is_open()) {
+				auditFile << "\n- deposited " << amount << " to " << getUserName() <<" 's Account.";
+			}
+			else {
+				cout << "\n Audit file is not available in withdraw function." << endl;
+			}*/
+		cout << endl << amount << " was deposited to the account"
+			"\nAccount balance now: " << getBalance();
+		updateThisInDatabase();
+	} catch (const invalid_argument& e) {
+        cerr << "\nError: Invalid balance format. Deposit failed. " << e.what() << endl; // More specific error
+    } catch (const out_of_range& e) {
+        cerr << "\nError: Balance out of range. Deposit failed. " << e.what() << endl;
+    } 
 
 }
 

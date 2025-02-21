@@ -26,8 +26,8 @@
 					getline(recordLine, Password, ',');
 					getline(recordLine, PhoneNumber, ',');
 					getline(recordLine, Age, ',');
-					getline(recordLine, Balance, ',');
 					getline(recordLine, AccountTypeName, ',');
+					getline(recordLine, Balance, ',');
 					getline(recordLine, IsActiveStr, ',');
 
 					bool IsActive = (IsActiveStr == "Active");
@@ -51,6 +51,10 @@
 	}
 
 	bool Admin::isAllowedOperation(const string& targetEmail) {
+		if (!doesAccountExist(targetEmail)) {
+			cout << "\n Error, there is no account with ( " << targetEmail << " ) email in the system.\n";
+			return false;
+		}
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == targetEmail) {
 				if (accounts[i].getRole() == "branch")continue;
@@ -186,6 +190,10 @@
 	 bool Admin::updateAccountRole(const string& targetEmail, const string& newRole)
 	{
 		loadAllAccountsFromDatabase();
+		if (!doesAccountExist(targetEmail)) {
+			cout << "\n Error, there is no account with ( " << targetEmail << " ) email in the system.\n";
+			return false;
+		}
 		if (!isAllowedOperation(targetEmail)) {
 			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
 			return false;
@@ -224,24 +232,36 @@
 				}
 			}
 		}
-		cout << "\n Error, there is no account with ( " << targetEmail << " ) email in the system.\n";
+		cout << "\n UnExpected Error Happend!!, (Update Account's Role Operation)\n";
 		return false;
 	}
 
 	bool Admin::displayInfoForAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!doesAccountExist(accountEmail)) {
+			cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+			return false;
+		}
+		if (!isAllowedOperation(accountEmail)) {
+			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+			return false;
+		}
 		for (int i = 0; i < accounts.size(); i++) {
 			if (accounts[i].getEmail() == accountEmail) {
 				accounts[i].displayAccountInfo();
 				return true;
 			}
 		}
-		cout << "\n Display Account's Info :there is no Account with such an Email";
+		cout << "\n UnExpected Error Happend!! , (Display Account's Info)\n";
 		return false;
 	}
 
 	 bool Admin:: deleteAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!doesAccountExist(accountEmail)) {
+			cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+			return false;
+		}
 		if (!isAllowedOperation(accountEmail)) {
 			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
 			return false;
@@ -278,12 +298,16 @@
 			}
 
 		}
-		cout << "\n Delete :there is no Account with such an Email"<<endl;
+		cout << "\n UnExpected Error Happend!! , (Delete Account Operation)\n";
 		return false;
 	}
 
 	bool Admin::updateAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!doesAccountExist(accountEmail)) {
+			cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+			return false;
+		}
 		if (!isAllowedOperation(accountEmail)) {
 			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
 			return false;
@@ -295,12 +319,16 @@
 				return true;
 			}
 		}
-		cout << "\n Update :there is no Account with such an Email";
+		cout << "\n UnExpected Error Happend!! , (Update Account Operation)\n";
 		return false;
 	}
 
 	bool Admin::withdrawFromAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!doesAccountExist(accountEmail)) {
+			cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+			return false;
+		}
 		if (!isAllowedOperation(accountEmail)) {
 			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
 			return false;
@@ -314,12 +342,16 @@
 				return true;
 			}
 		}
-		cout << "\n Withdraw from Account :there is no Account with such an Email";
+		cout << "\n UnExpected Error Happend!! , (Withdraw From An Account Operation)\n";
 		return false;
 	}
 
 	bool Admin::depositToAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!doesAccountExist(accountEmail)) {
+			cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+			return false;
+		}
 		if (!isAllowedOperation(accountEmail)) {
 			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
 			return false;
@@ -332,7 +364,7 @@
 				return true;
 			}
 		}
-		cout << "\n Deposit to Account :there is no Account with such an Email";
+		cout << "\n UnExpected Error Happend!! , (Depost to An Account Operation)\n";
 		return false;
 	}
 
@@ -370,6 +402,10 @@
 
 	bool Admin::deactivateAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!doesAccountExist(accountEmail)) {
+			cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+			return false;
+		}
 		if (!isAllowedOperation(accountEmail)) {
 			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
 			return false;
@@ -386,12 +422,16 @@
 				return true;
 			}
 		}
-		cout << "\n Deactivate Account :there is no Account with such an Email";
+		cout << "\n UnExpected Error Happend!! , (DeActivate An Account Operation)\n";
 		return false;
 	}
 
 	bool Admin::activateAccount(const string& accountEmail) {
 		loadAllAccountsFromDatabase();
+		if (!doesAccountExist(accountEmail)) {
+			cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+			return false;
+		}
 		if (!isAllowedOperation(accountEmail)) {
 			cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
 			return false;
@@ -408,7 +448,7 @@
 				return true;
 			}
 		}
-		cout << "\n Activate Account :there is no Account with such an Email";
+		cout << "\n UnExpected Error Happend!! , (Activate An Account Operation)\n";
 		return false;
 	}
 
@@ -571,7 +611,7 @@
 				}
 			}break;
 			case 12: {
-				cout << "stoped..\n----------------------------------";
+				cout << "Logged Out..\n----------------------------------";
 				cout << "\033[2J\033[1;1H";
 			}break;
 			default: {

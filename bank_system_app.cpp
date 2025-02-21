@@ -112,10 +112,6 @@ void clearauditfile() {
 
 */
 int main() {
-	SuperAdmin s1;
-	s1.superAdminMenu();
-	Admin a1;
-	a1.adminMenu();
 	Bank B1;
 	B1.authenticateUser();
 

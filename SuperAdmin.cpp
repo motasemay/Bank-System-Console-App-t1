@@ -21,6 +21,10 @@ void SuperAdmin::displayAdminAccounts()
 
 bool SuperAdmin::isAllowedOperation(const string& targetEmail)
 {
+	if (!doesAccountExist(targetEmail)) {
+		cout << "\n Error, there is no account with ( " << targetEmail << " ) email in the system.\n";
+		return false;
+	}
 	for (int i = 0; i < accounts.size(); i++) {
 		if (accounts[i].getEmail() == targetEmail) {
 			if (accounts[i].getRole() == "branch")continue;
@@ -30,10 +34,35 @@ bool SuperAdmin::isAllowedOperation(const string& targetEmail)
 	return false;
 }
 
+bool SuperAdmin::displayInfoForAccount(const string& accountEmail) {
+	loadAllAccountsFromDatabase();
+	if (!doesAccountExist(accountEmail)) {
+		cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+		return false;
+	}
+	if (!isAllowedOperation(accountEmail)) {
+		cout << "\n Unauthorized Operation, Cannot Apply this operation to a SuperAdmin Account.\n";
+		return false;
+	}
+	for (int i = 0; i < accounts.size(); i++) {
+		if (accounts[i].getEmail() == accountEmail) {
+			accounts[i].displayAccountInfo();
+			return true;
+		}
+	}
+	cout << "\n UnExpected Error Happend!! , (Display Account's Info)\n";
+	return false;
+}
+
+
 bool SuperAdmin::deleteAccount(const string& accountEmail) {
 	loadAllAccountsFromDatabase();
+	if (!doesAccountExist(accountEmail)) {
+		cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+		return false;
+	}
 	if (!isAllowedOperation(accountEmail)) { //ASK : im i need to override just to use the superadmin version of isAllow..
-		cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+		cout << "\n Unauthorized Operation, Cannot Apply this operation to a SuperAdmin Account.\n";
 		return false;
 	}
 	bool accountFound = false;
@@ -68,10 +97,129 @@ bool SuperAdmin::deleteAccount(const string& accountEmail) {
 		}
 
 	}
-	cout << "\n Delete :there is no Account with such an Email" << endl;
+	cout << "\n UnExpected Error Happend!! , (Delete Account Operation)\n";
 	return false;
 }
 
+bool SuperAdmin::updateAccount(const string& accountEmail)
+{
+	loadAllAccountsFromDatabase();
+	if (!doesAccountExist(accountEmail)) {
+		cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+		return false;
+	}
+	if (!isAllowedOperation(accountEmail)) {
+		cout << "\n Unauthorized Operation, Cannot Apply this operation to a SuperAdmin Account.\n";
+		return false;
+	}
+	for (int i = 0; i < accounts.size(); i++) {
+		if (accounts[i].getEmail() == accountEmail) {
+			accounts[i].updateAccountInfo();
+			cout << "\n" << accounts[i].getUserName() << " Account's info is updated";
+			return true;
+		}
+	}
+	cout << "\n UnExpected Error Happend!! , (Update Account Operation)\n";
+	return false;
+}
+
+bool SuperAdmin::withdrawFromAccount(const string& accountEmail)
+{
+	loadAllAccountsFromDatabase();
+	if (!doesAccountExist(accountEmail)) {
+		cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+		return false;
+	}
+	if (!isAllowedOperation(accountEmail)) {
+		cout << "\n Unauthorized Operation, Cannot Apply this operation to an Admin Account.\n";
+		return false;
+	}
+	double amount;
+	for (int i = 0; i < accounts.size(); i++) {
+		if (accounts[i].getEmail() == accountEmail) {
+			amount = getValidInput<double>("\n how much you want to withdraw:");
+			accounts[i].withdraw(amount);
+			//FIXTHIS: cout << "\n" << amount << " is withdrawed from " << accounts[i].getUserName() << "'s Account";
+			return true;
+		}
+	}
+	cout << "\n UnExpected Error Happend!! , (Withdraw From An Account Operation)\n";
+	return false;
+}
+
+bool SuperAdmin::depositToAccount(const string& accountEmail) {
+	loadAllAccountsFromDatabase(); //ASK , can i use this from admin?
+	if (!doesAccountExist(accountEmail)) {
+		cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+		return false;
+	}
+	if (!isAllowedOperation(accountEmail)) {
+		cout << "\n Unauthorized Operation, Cannot Apply this operation to a SuperAdmin Account.\n";
+		return false;
+	}
+	double amount;
+	for (int i = 0; i < accounts.size(); i++) {
+		if (accounts[i].getEmail() == accountEmail) {
+			amount = getValidInput<double>("\n how much you want to deposit: ");
+			accounts[i].deposit(amount);
+			return true;
+		}
+	}
+	cout << "\n UnExpected Error Happend!! , (Depost to An Account Operation)\n";
+	return false;
+}
+
+bool SuperAdmin::deactivateAccount(const string& accountEmail) {
+	loadAllAccountsFromDatabase();
+	if (!doesAccountExist(accountEmail)) {
+		cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+		return false;
+	}
+	if (!isAllowedOperation(accountEmail)) {
+		cout << "\n Unauthorized Operation, Cannot Apply this operation to a SuperAdmin Account.\n";
+		return false;
+	}
+	for (int i = 0; i < accounts.size(); i++) {
+		if (accounts[i].getEmail() == accountEmail) {
+			if (accounts[i].getIsActive() == false) {
+				cout << "\n" << accounts[i].getUserName() << " Account's is already Dactivated...";
+				return true;
+			}
+			accounts[i].setIsActive(false);
+			cout << "\n" << accounts[i].getUserName() << " Account's is deactivated ";
+			accounts[i].updateThisInDatabase();
+			return true;
+		}
+	}
+	cout << "\n UnExpected Error Happend!! , (DeActivate An Account Operation)\n";
+	return false;
+}
+
+bool SuperAdmin::activateAccount(const string& accountEmail) {
+	loadAllAccountsFromDatabase();
+	if (!doesAccountExist(accountEmail)) {
+		cout << "\n Error, there is no account with ( " << accountEmail << " ) email in the system.\n";
+		return false;
+	}
+	if (!isAllowedOperation(accountEmail)) {
+		cout << "\n Unauthorized Operation, Cannot Apply this operation to a SuperAdmin Account.\n";
+		return false;
+	}
+	for (int i = 0; i < accounts.size(); i++) {
+		if (accounts[i].getEmail() == accountEmail) {
+			if (accounts[i].getIsActive() == true) {
+				cout << "\n" << accounts[i].getUserName() << " Account's is already Active..";
+				return true;
+			}
+			accounts[i].setIsActive(true);
+			cout << "\n" << accounts[i].getUserName() << " Account's is Aactivated ";
+			accounts[i].updateThisInDatabase();
+			return true;
+		}
+	}
+	cout << "\n UnExpected Error Happend!! , (Activate An Account Operation)\n";
+	return false;
+}
 
 void SuperAdmin::displaySuperAdminAccounts()
 {
@@ -92,6 +240,10 @@ void SuperAdmin::displaySuperAdminAccounts()
 
 bool SuperAdmin::updateAccountRole(const string& targetEmail, const string& newRole) {
 	loadAllAccountsFromDatabase();
+	if (!doesAccountExist(targetEmail)) {
+		cout << "\n Error, there is no account with ( " << targetEmail << " ) email in the system.\n";
+		return false;
+	}
 	if (!isAllowedOperation(targetEmail)) {
 		cout << "\n Unauthorized Operation, Cannot Apply this operation to a SuperAdmin Account.\n";
 		return false;
@@ -136,25 +288,24 @@ bool SuperAdmin::updateAccountRole(const string& targetEmail, const string& newR
 			}
 		}
 	}
-	cout << "\n Error, there is no account with ( " << targetEmail << " ) email in the system.\n";
+	cout << "\n UnExpected Error Happend!!, (Update Account's Role Operation)\n";
 	return false;
 }
 
 void SuperAdmin::superAdminMenu()
 {
-
 	int choise = -1;
-	while (choise != 15) {
+	while (choise != 14) {
 		cout << "\n - - - - - - - -";
 	displayAdminAccounts();
 	displayActiveAccounts();
-	//displayInactiveAccounts();
+	displayInactiveAccounts();
 		cout << "\n - - - - - - - -";
 		cout<<"\n Super Admin's Menu : "
-			<<"\n 1.Updata An Account's Role."
-			<<"\n 2.Display SuperAdmin's Accounts."
-			<<"\n 3.Display Admin's Accounts."
-			<<"\n----"
+			<<"\n1.Updata An Account's Role."
+			<<"\n2.Display SuperAdmin's Accounts."
+			<<"\n3.Display Admin's Accounts."
+			<<"\n  ----"
 			<< "\n4.Create A New Account."
 			<< "\n5.Display An Account's Info."
 			<< "\n6.Delete An Account."
@@ -165,8 +316,7 @@ void SuperAdmin::superAdminMenu()
 			<< "\n11.Display InActive Accounts"
 			<< "\n12.Deactivate An Account."
 			<< "\n13.Activate An Account."
-			<< "\n14.Update A Customer Role."
-			<< "\n15.Log Out.";
+			<< "\n14.Log Out.";
 
 		choise = getValidInput<int>("\n choose the operation: ");
 		switch (choise) {
@@ -229,7 +379,23 @@ void SuperAdmin::superAdminMenu()
 				break;
 			}
 		}break;
-		case 50: {
+		case 7: {
+			string searchEmail;
+			while (true) {
+				cout << "\n Enter the Email for the Account to UPDATE: ";
+				getline(cin, searchEmail);
+				if (searchEmail == "stop") {
+					cout << "\033[2J\033[1;1H";
+					break;
+				}
+				if (!updateAccount(searchEmail)) {
+					cout << ", Try Again, or write \"stop\" : ";
+					continue;
+				}
+				break;
+			}
+		}break;
+		case 8: {
 			string searchEmail;
 			while (true) {
 				cout << "\n Enter the Email for the Account to WITHDRAW from: ";
@@ -245,7 +411,7 @@ void SuperAdmin::superAdminMenu()
 				break;
 			}
 		}break;
-		case 600: {
+		case 9: {	
 			string searchEmail;
 			while (true) {
 				cout << "\n Enter the Email for the Account to DEPOSIT to it: ";
@@ -261,13 +427,13 @@ void SuperAdmin::superAdminMenu()
 				break;
 			}
 		}break;
-		case 7: {
+		case 10: {
 			displayActiveAccounts();
 		}break;
-		case 8: {
+		case 11: {
 			displayInactiveAccounts();
 		}break;
-		case 9: {
+		case 12: {
 			string searchEmail;
 			while (true) {
 				cout << "\n Enter the Email for the Account to DEACTIVATE it: ";
@@ -283,7 +449,7 @@ void SuperAdmin::superAdminMenu()
 				break;
 			}
 		}break;
-		case 10: {
+		case 13: {
 			string searchEmail;
 			while (true) {
 				cout << "\n Enter the Email for the Account to ACTIVATE it: ";
@@ -299,24 +465,8 @@ void SuperAdmin::superAdminMenu()
 				break;
 			}
 		}break;
-		case 11: {
-			string searchEmail;
-			while (true) {
-				cout << "\n Enter the Email for the Customer to Make him Admin: ";
-				getline(cin, searchEmail);
-				if (searchEmail == "stop") {
-					cout << "\033[2J\033[1;1H";
-					break;
-				}
-				if (!updateAccountRole(searchEmail, "admin")) {
-					cout << ", Try again or write \"stop\": ";
-					continue;
-				}
-				break;
-			}
-		}break;
-		case 12: {
-			cout << "stoped..\n----------------------------------";
+		case 14: {
+			cout << "Logged Out..\n----------------------------------";
 			cout << "\033[2J\033[1;1H";
 		}break;
 		default: {

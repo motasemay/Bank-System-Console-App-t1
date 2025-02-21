@@ -1,6 +1,7 @@
 #include "Bank.h"
 #include "Customer.h"
 #include "Admin.h"
+#include "SuperAdmin.h"
 #include <iostream>
 #include <string>
 #include <regex>
@@ -99,6 +100,16 @@ bool Bank::authenticateUser() {
 				Admin loginAdmin;
 				loginAdmin.loadAllAccountsFromDatabase();
 				loginAdmin.adminMenu();
+				loginAttempts = 0;
+				continue;
+			}
+			else if (Role == "superadmin") {
+				cout << "\033[2J\033[1;1H";
+				cout << "\n LOGIN successfully.";
+				cout << "\n Welcome To The System Manager";
+				SuperAdmin loginSuperAdmin;
+				loginSuperAdmin.loadAllAccountsFromDatabase();
+				loginSuperAdmin.superAdminMenu();
 				loginAttempts = 0;
 				continue;
 			}
