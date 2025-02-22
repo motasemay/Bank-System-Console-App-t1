@@ -295,7 +295,7 @@ bool SuperAdmin::updateAccountRole(const string& targetEmail, const string& newR
 void SuperAdmin::superAdminMenu()
 {
 	int choise = -1;
-	while (choise != 14) {
+	while (choise != 15) {
 		cout << "\n - - - - - - - -";
 	displayAdminAccounts();
 	displayActiveAccounts();
@@ -316,7 +316,8 @@ void SuperAdmin::superAdminMenu()
 			<< "\n11.Display InActive Accounts"
 			<< "\n12.Deactivate An Account."
 			<< "\n13.Activate An Account."
-			<< "\n14.Log Out.";
+			<<"\n14.Login As Customer (open Customer Panel for Your Account)."
+			<< "\n15.Log Out.";
 
 		choise = getValidInput<int>("\n choose the operation: ");
 		switch (choise) {
@@ -466,6 +467,9 @@ void SuperAdmin::superAdminMenu()
 			}
 		}break;
 		case 14: {
+			this->customerMenu();
+		}break;
+		case 15: {
 			cout << "Logged Out..\n----------------------------------";
 			cout << "\033[2J\033[1;1H";
 		}break;

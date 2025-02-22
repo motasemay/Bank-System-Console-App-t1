@@ -86,7 +86,7 @@ bool Bank::authenticateUser() {
 
 			if (Role == "customer" || Role == "Customer") {
 				cout << "\033[2J\033[1;1H";
-				cout << "\n LOGIN successfully.";
+				cout << "\n LogIn successfully.";
 				Customer loginCustomer;
 				loginCustomer.loadFromDatabase(storedId);
 				loginCustomer.loadRelatedAccounts(storedEmail);
@@ -96,8 +96,10 @@ bool Bank::authenticateUser() {
 			}
 			else if (Role == "admin" || Role == "Admin") {
 				cout << "\033[2J\033[1;1H";
-				cout << "\n LOGIN successfully.";
+				cout << "\n LogIn successfully (Admin).";
 				Admin loginAdmin;
+				loginAdmin.loadFromDatabase(storedId);
+				loginAdmin.loadRelatedAccounts(storedEmail);
 				loginAdmin.loadAllAccountsFromDatabase();
 				loginAdmin.adminMenu();
 				loginAttempts = 0;
@@ -105,9 +107,10 @@ bool Bank::authenticateUser() {
 			}
 			else if (Role == "superadmin") {
 				cout << "\033[2J\033[1;1H";
-				cout << "\n LOGIN successfully.";
-				cout << "\n Welcome To The System Manager";
+				cout << "\n LogIn successfully (Super Admin).";
 				SuperAdmin loginSuperAdmin;
+				loginSuperAdmin.loadFromDatabase(storedId);
+				loginSuperAdmin.loadRelatedAccounts(storedEmail);
 				loginSuperAdmin.loadAllAccountsFromDatabase();
 				loginSuperAdmin.superAdminMenu();
 				loginAttempts = 0;

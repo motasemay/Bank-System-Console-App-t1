@@ -454,7 +454,7 @@
 
 	void Admin::adminMenu() {
 		int choise = 0;
-		while (choise != 12) {
+		while (choise != 13) {
 			cout << "\n---------";
 			displayActiveAccounts();
 			displayInactiveAccounts();
@@ -470,7 +470,8 @@
 				<< "\n9.Deactivate An Account."
 				<< "\n10.Activate An Account."
 				<< "\n11.Update A Customer Role."
-				<< "\n12. Log Out.";
+				<<"\n12.Login As Customer(open customer Panel for Your Account)."
+				<< "\n13. Log Out.";
 			choise = getValidInput<int>("\n choose the operation: ");
 			switch (choise) {
 			case 1: {
@@ -611,6 +612,9 @@
 				}
 			}break;
 			case 12: {
+				this->customerMenu();
+			}break;
+			case 13: {
 				cout << "Logged Out..\n----------------------------------";
 				cout << "\033[2J\033[1;1H";
 			}break;

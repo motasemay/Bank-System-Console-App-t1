@@ -101,7 +101,7 @@ void Customer :: customerMenu() {
 			break;
 		}
 		case 6: {
-			cout << "\nExiting customer menu.\n";
+			cout << "\Logged Out...\n";
 			//system("CLS");// ASK: isn't recommanded for security perposes	 
 			cout << "\033[2J\033[1;1H";
 			break;

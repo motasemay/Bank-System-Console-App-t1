@@ -1,4 +1,6 @@
-1538,branch,,m@gmail.com,,,,Saving,10.000000,Active
 1702,superadmin,sami,sa@gmail.com,motasemay,0569999999,05,Main,200,Active
-1776,admin,mohannnnnnad,nn@gmail.com,motasemay,2222222222,100,Main,10000,Active
-1904,admin,cmot,mot@gmail.com,motasemay,0569676252,22,Main,50000,Active
+3186,customer,motasemOne,one@gmail.com,motasemay,0568676250,25,Main,1.000000,Active
+3196,admin,motasemTwo,two@gmail.com,motasemay,0568676250,02,Main,200,Active
+3209,admin,motasemThree,three@gmail.com,motasemay,0569999999,30,Main,300010.000000,Active
+3884,branch,,three@gmail.com,,,,saving,0.00,Active
+3978,branch,,sa@gmail.com,,,,Saving Account,0.00,Active
